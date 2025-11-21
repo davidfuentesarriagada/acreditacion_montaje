@@ -1,0 +1,9 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<meta charset="UTF-8">
+	<th:block th:fragment="import-forefront">
+		<th:block th:replace="~{fragments/confirm :: import-confirm}" />
+		<th:block th:replace="~{fragments/loading :: import-loading}" />
+		<th:block th:replace="~{fragments/toast :: import-toast}" />
+		<th:block th:replace="~{fragments/alerta :: import-alerta}" />
+	</th:block>
+</html>

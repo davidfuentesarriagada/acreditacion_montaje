@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+</head>
+<body>
+    <div class="container text-center">
+	    <th:block th:replace="~{fragments/menu :: import-menu}" />
+        <h1>Bienvenido <span th:text="${#authentication.principal.usuario.nombre}"></span></h1>
+    </div>
+</body>
+</html>

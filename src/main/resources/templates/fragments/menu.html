@@ -1,0 +1,49 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<meta charset="UTF-8">
+<th:block th:fragment="import-menu">
+	<nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
+		<div class="container-fluid">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarColor01">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" aria-current="page" href="#">Home</a>
+					</li>
+					<li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
+						<a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Registro</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" th:href="@{/importarExpositoresAcreditacion}">Importar Excel Acreditación</a></li>
+							<li><a class="dropdown-item" th:href="@{/importarExpositoresNube}">Importar Excel Nube</a></li>
+							<li><a class="dropdown-item" th:href="@{/listaPersonal}">Lista del personal</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Asistencia</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" th:href="@{/scan}" th:if="${@environment.getProperty('propiedad.ver.marca-asistencia')}">Marcado de asistencia</a></li>
+							<li><a class="dropdown-item" th:href="@{/exportarAsistencia}">Listado de asistencia</a></li>
+						</ul>
+					</li>
+					<li class="nav-item" th:if="${@environment.getProperty('propiedad.ver.marca-asistencia')}">
+						<a class="btn btn-warning" th:href="@{/scan}">SCAN</a>
+					</li>
+					<li class="nav-item" sec:authorize="hasRole('ADMIN')">
+						<a class="nav-link active" th:href="@{/listaUsuario}" aria-current="page">Usuarios</a>
+					</li>
+					<li class="nav-item">
+						<span class="badge text-bg-success" th:if="${@environment.getProperty('propiedad.ver.marca-asistencia')}">Asistencia habilitada</span>
+						<span class="badge text-bg-secondary" th:unless="${@environment.getProperty('propiedad.ver.marca-asistencia')}">Asistencia no habilitada</span>
+						<span class="badge text-bg-success" th:if="${@environment.getProperty('propiedad.printTicket')}">Imprime tickets</span>
+						<span class="badge text-bg-secondary" th:unless="${@environment.getProperty('propiedad.printTicket')}">Impresión no habilitada</span>
+					</li>
+				</ul>
+				<div class="d-flex">
+					<button id="btnSalir" class="btn btn-danger">Salir</button>
+				</div>
+			</div>
+		</div>
+	</nav>
+</th:block>
+</html>

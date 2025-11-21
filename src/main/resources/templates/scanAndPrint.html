@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Escaneo de código QR e impresión de ticket</title>
+<th:block th:replace="~{fragments/css :: import-css}" />
+<th:block th:replace="~{fragments/js :: import-js}" />
+<link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
+<script th:src="@{/print.min.js}"></script>
+<script th:src="@{/scanAndPrint.js}"></script>
+</head>
+<body>
+	<div class="container">
+		<th:block th:replace="~{fragments/menu :: import-menu}" />
+		<div class="row">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-4">
+						<input id="lbl_scan_codigo" class="form-control" type="text" placeholder="Escanee aquí el código QR con la pistola">
+					</div>
+				</div>
+				<div class="row">
+					<div style="width: 500px" id="reader"></div>
+				</div>
+				<div class="row" id="img_ticket"></div>
+			</div>
+			
+		</div>
+		<th:block th:replace="~{fragments/forefront :: import-forefront}" />
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+<meta charset="UTF-8">
+<title th:text="${personal.nombre}"></title>
+<th:block th:replace="~{fragments/css :: import-css}" />
+<th:block th:replace="~{fragments/js :: import-js}" />
+<link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
+<script th:src="@{/print.min.js}"></script>
+<script th:src="@{/editar.js}"></script>
+</head>
+<body>
+	<div class="container">
+		<th:block th:replace="~{fragments/menu :: import-menu}" sec:authorize="isAuthenticated()"/>
+		<div class="row">
+			<div class="col-sm-5">
+				<form>
+					<div class="input-group mb-3">
+						<span class="input-group-text">* Nombre</span>
+						<input type="text" class="form-control" id="lbl_nombre" th:value="${personal.nombre}">
+					</div>
+					<div class="input-group mb-3">
+						<div class="input-group-text">
+							<input class="form-check-input" type="radio" name="options" value="nacional" th:checked="${personal.extranjero ? false : true}">
+						</div>
+						<label class="input-group-text">Nacional: Rut</label>
+						<input type="text" class="form-control" id="lbl_rut_nacional" placeholder="números, sin dígito verificador" th:value="${personal.extranjero ? '' : personal.rut}">
+						<label class="input-group-text" id="lbl_rut_nacional_dv" th:text="${personal.extranjero ? 'N.A.' : '- '+personal.digitoVerificador}">-</label>
+					</div>
+					<div class="input-group mb-3">
+						<div class="input-group-text">
+							<input class="form-check-input" type="radio" name="options" value="extranjero" th:checked="${personal.extranjero}">
+						</div>
+						<label class="input-group-text">Extranjero: Pasaporte</label>
+						<input type="text" class="form-control" id="lbl_pass_extranjero" placeholder="Alfanumérico" th:value="${personal.extranjero ? personal.rut : ''}">
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">Observaciones</span>
+						<textarea class="form-control" id="lbl_observaciones" th:text="${personal.observaciones}"></textarea>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-10">
+				<button id="btn_guardar" class="btn btn-primary btn-sm" role="button">Guardar</button>
+				<a class="btn btn-secondary btn-sm" role="button" th:href="@{/listaPersonal}">Volver al listado</a>
+			</div>
+		</div>
+		<th:block th:replace="~{fragments/forefront :: import-forefront}"/>
+	</div>
+	<script th:inline="javascript">
+		var codigo = /*[[${personal.codigo}]]*/null;
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+	<meta charset="UTF-8">
+	<head th:block th:fragment="import-js">
+		<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+		<script th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.js}"></script>
+		<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+		<script th:src="@{/webjars/datatables/1.10.13/js/jquery.dataTables.js}"></script>
+		<script th:src="@{/webjars/select2/4.0.0/dist/js/select2.min.js}"></script>
+		<script th:src="@{/webjars/jquery.fileDownload/50171edfab/jquery.fileDownload.js}"></script>
+		<script th:src="@{/datatables.lenguaje.js}"></script>
+		<script th:src="@{/html5-qrcode/html5-qrcode.min.js}"></script>
+		<script th:src="@{/menu.js}"></script>
+		<script th:src="@{/general.js}"></script>
+		<script th:inline="javascript">
+			const contextpath = /*[[@{/}]]*/ "/";
+		</script>
+	</head>
+	<head th:block th:fragment="import-print-js">
+		<script th:src="@{/print.min.js}"></script>
+		<script th:src="@{/printTicket.js}"></script>
+	</head>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${personal.nombre}"></title>
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}"/>
+	<style type="text/css">
+		.clickleable {
+			cursor: pointer;
+			margin: 15px 0;
+		}
+	</style>
+	<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<h2>Acreditación de personal de montaje y desmontaje</h2>
+		</div>
+		<div class="row">
+			<dl class="row">
+				<dt class="col-sm-3">Código</dt>
+				<dd class="col-sm-9" th:text="${personal.codigo}"></dd>
+				<dt class="col-sm-3">Nombre</dt>
+				<dd class="col-sm-9" th:text="${personal.nombre}"></dd>
+				<dt class="col-sm-3">Empresa</dt>
+				<dd class="col-sm-9"></dd>
+			</dl>
+			<dl class="row" th:each="expositor : ${personal.listaExpositor}">
+				<dt class="col-sm-3"></dt>
+				<dd class="col-sm-9" th:text="${expositor.nombre}"></dd>
+			</dl>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<img th:src="@{'/personal/plantilla/'+${personal.codigo}+'.jpg'}" width="239" height="318">
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

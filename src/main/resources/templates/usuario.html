@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="@{'Usuario ' + ${usuario.nombre}}">Usuario</title>
+<th:block th:replace="~{fragments/css :: import-css}" />
+<th:block th:replace="~{fragments/js :: import-js}" />
+<script th:src="@{/usuario.js}"></script>
+</head>
+<body>
+	<div class="container">
+		<th:block th:replace="~{fragments/menu :: import-menu}" />
+		<div class="row">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Usuario</h5>
+					<form th:with="usuario=${usuario}">
+						<div class="form-group row">
+							<label for="lbl_nombre" class="col-sm-3 col-form-label">Nombre</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" id="lbl_nombre" th:value="${usuario.nombre}">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="lbl_email" class="col-sm-3 col-form-label">Email</label>
+							<div class="col-sm-4">
+								<input type="email" class="form-control" id="lbl_email" th:value="${usuario.email}">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="lbl_password" class="col-sm-3 col-form-label">Asignar nueva contraseña</label>
+							<div class="col-sm-4">
+								<input type="password" class="form-control" id="lbl_password" placeholder="Dejar en blanco para mantenerla">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="lbl_password_re"
+								class="col-sm-3 col-form-label">Repetir nueva contraseña</label>
+							<div class="col-sm-4">
+								<input type="password" class="form-control"
+									id="lbl_password_re" placeholder="Repita la contraseña">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="sel_role" class="col-sm-3 col-form-label">Perfil</label>
+							<div class="col-sm-4">
+								<select id="sel_role" class="form-control form-control-sm">
+									<option value="ROLE_USER" th:selected="(${usuario.role == 'ROLE_USER'})">Usuario</option>
+									<option value="ROLE_ADMIN" th:selected="(${usuario.role == 'ROLE_ADMIN'})">Administrador</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="form-check-label col-sm-3" for="chk_enabled">Habilitado</label>
+							<div class="form-check form-switch col-sm-4">
+								<input class="form-check-input" type="checkbox" id="chk_enabled" th:checked="${usuario.enabled}">
+							</div>
+						</div>
+						
+					</form>
+				</div>
+				<div class="card-footer">
+					<a class="btn btn-secondary btn-sm" role="button" th:href="@{/listaUsuario}">Volver al listado</a>
+					<button type="button" class="btn btn-primary btn-sm botonForm" id="btn_guardar">Guardar</button>
+				</div>
+			</div>
+		</div>
+		<th:block th:replace="~{fragments/forefront :: import-forefront}" />
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+<meta charset="UTF-8">
+<title th:text="${personal.nombre}"></title>
+<th:block th:replace="~{fragments/css :: import-css}" />
+<th:block th:replace="~{fragments/js :: import-js}" />
+<link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
+<script th:src="@{/print.min.js}"></script>
+<script th:src="@{/ver.js}"></script>
+</head>
+<body>
+	<div class="container">
+		<th:block th:replace="~{fragments/menu :: import-menu}"/>
+		<div class="row">
+			<div class="row">
+				<div class="alert alert-danger col-sm-6" th:if="${personal.fechaImpresionTicket != null}" role="alert">
+					El ticket ha sido impreso anteriormente
+				</div>
+			</div>
+			<dl class="row">
+				<dt class="col-sm-3">Código</dt>
+				<dd class="col-sm-9" th:text="${personal.codigo}"></dd>
+				<dt class="col-sm-3">Nombre</dt>
+				<dd class="col-sm-9" th:text="${personal.nombre}"></dd>
+				
+				<dt class="col-sm-3">Expositor(es)</dt>
+				<dd class="col-sm-9"></dd>
+			</dl>
+			<dl class="row" th:each="expositor : ${personal.listaExpositor}">
+				<dt class="col-sm-3"></dt>
+				<dd class="col-sm-9">
+					<span th:text="|${expositor.nombre} - ${expositor.email}|"></span>
+					<a class="btn btn-primary btn-sm" role="button" href="#" 
+						th:attr="onclick=|sendEmail('${expositor.id}')|">
+							<svg class="bi" width="14" height="14" fill="currentColor">
+								<use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#envelope}"></use>
+							</svg>
+					</a>
+				</dd>
+			</dl>
+			<dl class="row">
+				<dt class="col-sm-3">Rut</dt>
+				<dd class="col-sm-9" th:text="${personal.rutCompleto}"></dd>
+				<dt class="col-sm-3">Fecha envío email QR</dt>
+				<dd class="col-sm-9" th:if="${personal.fechaEnvioCredenciales == null}">No se ha enviado</dd>
+				<dd class="col-sm-9" th:unless="${personal.fechaEnvioCredenciales == null}" th:text="${personal.fechaEnvioCredenciales}"></dd>
+				<dt class="col-sm-3">¿Ticket impreso?</dt>
+				<dd class="col-sm-9" th:if="${personal.fechaImpresionTicket == null}">NO</dd>
+				<dd class="col-sm-9 text-success" th:unless="${personal.fechaImpresionTicket == null}">SI</dd>
+				<dt class="col-sm-3">Observaciones</dt>
+				<dd class="col-sm-9" th:text="${personal.observaciones}"></dd>
+			</dl>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<img th:src="@{'/personal/ticket/'+${personal.codigo}+'.png'}" width="239" height="100">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-10">
+				<a class="btn btn-primary btn-sm" role="button" href="#" 
+				th:attr="onclick=|initPrintTicket()|">
+					<svg class="bi" width="16" height="16" fill="currentColor">
+						<use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer}"></use>
+					</svg>
+					<span th:if="${personal.fechaImpresionTicket == null}">Imprimir</span>
+					<span th:if="${personal.fechaImpresionTicket != null}">Volver a Imprimir</span>
+				</a>
+				<button id="btn_generate_images" class="btn btn-primary btn-sm" role="button" sec:authorize="hasRole('ADMIN')"
+					th:unless="${personal.fechaImpresionTicket == null}" >Recrear QR, ticket y plantilla</button>
+				<button id="btn_delete" type="button" class="btn btn-danger btn-sm pull-right">Eliminar</button>
+				<a class="btn btn-secondary btn-sm" role="button" th:href="@{/listaPersonal}">Volver al listado</a>
+			</div>
+		</div>
+		<th:block th:replace="~{fragments/forefront :: import-forefront}"/>
+	</div>
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+		var codigo = /*[[${personal.codigo}]]*/null;
+		var fechaImpresion = /*[[${personal.fechaImpresionTicket}]]*/null;
+		let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket') == 'true'}]]*/false;
+	/*]]>*/
+	</script>
+</body>
+
+</html>

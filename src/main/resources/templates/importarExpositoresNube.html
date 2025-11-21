@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>Cargar planilla de expositores con el personal de montaje exportada desde la nube</title>
+		<th:block th:replace="~{fragments/css :: import-css}" />
+		<th:block th:replace="~{fragments/js :: import-js}" />
+		<script th:src="@{/importarPlanillaExpositores.js}"></script>
+	</head>
+	<body>
+		<div class="container">
+			<th:block th:replace="~{fragments/menu :: import-menu}" />
+			<form action="/import/expositoresFromNube" method="POST" enctype="multipart/form-data" id="form_upload">
+				<div class="form-group row">
+					<label for="myFile" class="col-sm-3 col-form-label col-form-label-sm">Seleccione el archivo excel:</label>
+					<div class="col-sm-2">
+						<input type="file" id="myFile" name="file">
+					</div>
+				</div>
+				<button class="btn btn-primary" id="btn_guardar">Aceptar</button>
+			</form>
+			<th:block th:replace="~{fragments/forefront :: import-forefront}" />
+		</div>
+	</body>
+
+</html>

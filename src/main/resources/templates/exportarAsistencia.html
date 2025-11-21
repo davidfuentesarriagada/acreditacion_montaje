@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>Exportación de la asistencia registrada del personal de montaje</title>
+		<th:block th:replace="~{fragments/css :: import-css}" />
+		<th:block th:replace="~{fragments/js :: import-js}" />
+		<script th:src="@{/exportarAsistencia.js}"></script>
+	</head>
+	<body>
+		<div class="container">
+			<th:block th:replace="~{fragments/menu :: import-menu}" />
+			<div class="row">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-4">
+							<button type="button" class="btn btn-success btn-sm" id="btn_export">Exportar asistencia</button>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			<th:block th:replace="~{fragments/forefront :: import-forefront}" />
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,21 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<meta charset="UTF-8">
+	<th:block th:fragment="footer-contact(emailResponsable)">
+	<tr>
+		<td style="padding: 20px; background: #343A40; color: bisque;">
+			Para más información comunicarse al e-mail <a th:href="|mailto:${emailResponsable}|" th:text="${emailResponsable}"></a>
+		</td>
+	</tr>
+	</th:block>
+	<th:block th:fragment="footer-unsubscribe(nombreEvento)">
+	<tr>
+		<td style="padding:20px;background:#343A40; color: bisque;">
+			Si no desea seguir recibiendo estos anuncios, haga click 
+			<span th:if="${link_desuscripcion != null}">
+				<a th:href="${link_desuscripcion}" style="color: #888888; text-decoration: underline;">acá</a> o
+			</span>
+			<a th:href="|mailto:desuscripciones@sicep.cl?subject=${nombreEvento} - unsub|">acá</a> para desuscribirse.
+		</td>
+	</tr>
+	</th:block>
+</html>
