@@ -27,6 +27,7 @@ public class UsuarioController {
 	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/usuario/register")
 	public ResponseEntity<Object> register(@RequestBody UsuarioDTO dto, Principal principal) {
+		System.out.println("Registro de usuario: " + dto);
 		try {
 			Usuario admin = usuarioService.getUsuarioFromSession(principal);
 			usuarioService.register(admin, dto);
