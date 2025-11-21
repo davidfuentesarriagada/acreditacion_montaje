@@ -47,6 +47,55 @@ public class DataLoader implements ApplicationRunner {
 			usuario.setPassword(passwordEncoder.encode("789789"));
 			usuarioRepository.save(usuario);
 		}
+		if (!usuarioRepository.existsByEmailIgnoreCase("dfuentes@sicep.cl")) {
+			Usuario usuario = new Usuario();
+			usuario.setEmail("dfuentes@sicep.cl");
+			usuario.setNombre("David Fuentes");
+			usuario.setRole(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
+			usuario.setPassword(passwordEncoder.encode("789789"));
+			usuarioRepository.save(usuario);
+		}
+		if (!usuarioRepository.existsByEmailIgnoreCase("jramirez@sicep.cl")) {
+			Usuario usuario = new Usuario();
+			usuario.setEmail("jramirez@sicep.cl");
+			usuario.setNombre("Jeanette Ramirez");
+			usuario.setRole(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
+			usuario.setPassword(passwordEncoder.encode("789789"));
+			usuarioRepository.save(usuario);
+		}
+		if (!usuarioRepository.existsByEmailIgnoreCase("karlau.codetia@aia.cl")) {
+			Usuario usuario = new Usuario();
+			usuario.setEmail("karlau.codetia@aia.cl");
+			usuario.setNombre("Karla Urbina");
+			usuario.setRole(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
+			usuario.setPassword(passwordEncoder.encode("789789"));
+			usuarioRepository.save(usuario);
+		}
+		if (!usuarioRepository.existsByEmailIgnoreCase("mtrigo@sicep.cl")) {
+			Usuario usuario = new Usuario();
+			usuario.setEmail("mtrigo@sicep.cl");
+			usuario.setNombre("Manuel Trigo");
+			usuario.setRole(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
+			usuario.setPassword(passwordEncoder.encode("789789"));
+			usuarioRepository.save(usuario);
+		}
+		if (!usuarioRepository.existsByEmailIgnoreCase("cgallo@sicep.cl")) {
+			Usuario usuario = new Usuario();
+			usuario.setEmail("cgallo@sicep.cl");
+			usuario.setNombre("usuario");
+			usuario.setRole(EnumRole.ROLE_USER.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
+			usuario.setPassword(passwordEncoder.encode("789789"));
+			usuarioRepository.save(usuario);
+		}
 	}
 
 	private void crearCarpetaQR() throws Exception {

@@ -11,7 +11,7 @@
 	<groupId>com.sicep.exponor2023</groupId>
 	<artifactId>acreditacion_montaje</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>acreditacion_montaje</name>
 	<description>Sistema de acreditación de montajes exponor 2023</description>
 	<properties>

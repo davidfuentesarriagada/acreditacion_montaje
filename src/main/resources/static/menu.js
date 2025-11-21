@@ -1,5 +1,7 @@
 $(function() {
 	$('#btnSalir').click(function() {
-		window.location = "/logout";
+        const segments = window.location.pathname.split('/');
+        const context = (segments.length > 1 && segments[1] !== '') ? '/' + segments[1] : '';
+        window.location = context + '/logout';
 	});
 });
