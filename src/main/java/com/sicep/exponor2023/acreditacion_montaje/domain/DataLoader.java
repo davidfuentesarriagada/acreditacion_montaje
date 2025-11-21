@@ -28,11 +28,15 @@ public class DataLoader implements ApplicationRunner {
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		log.info("inicio");
+		log.info("INICIO CARGA USUARIOS");
 		developer();
+		log.info("INICIO CREACION CARPETA QR");
 		crearCarpetaQR();
+		log.info("INICIO CREACION CARPETA PLANTILLA");
 		crearCarpetaPlantilla();
+		log.info("INICIO CREACION CARPETA TICKETS");
 		crearCarpetaTickets();
+		log.info("DATALOADER END");
 	}
 	
 	private void developer() {
