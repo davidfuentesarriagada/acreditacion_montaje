@@ -24,12 +24,8 @@
 				<dd class="col-sm-9" th:text="${personal.codigo}"></dd>
 				<dt class="col-sm-3">Nombre</dt>
 				<dd class="col-sm-9" th:text="${personal.nombre}"></dd>
-				<dt class="col-sm-3">Empresa</dt>
-				<dd class="col-sm-9"></dd>
-			</dl>
-			<dl class="row" th:each="expositor : ${personal.listaExpositor}">
-				<dt class="col-sm-3"></dt>
-				<dd class="col-sm-9" th:text="${expositor.nombre}"></dd>
+                <dt class="col-sm-3">RUT</dt>
+                <dd class="col-sm-9" th:text="${personal.rut + '-' + personal.getDigitoVerificador()}"></dd>
 			</dl>
 		</div>
 		<div class="row">
