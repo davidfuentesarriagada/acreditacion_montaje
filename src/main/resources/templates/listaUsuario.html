@@ -1,120 +1,253 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Usuario</title>
-<th:block th:replace="~{fragments/css :: import-css}" />
-<th:block th:replace="~{fragments/js :: import-js}" />
-<script th:src="@{/listaUsuario.js}"></script>
-</head>
-<body>
-	<div class="container">
-		<th:block th:replace="~{fragments/menu :: import-menu}" />
-		<div class="row">
-			<div class="card">
-				<div class="card-body">
-					<div class="row">
-						<div class="col-sm-4">
-							<div class="form-check form-switch">
-								<input class="form-check-input" type="checkbox" id="chk_filtro_enabled" role="switch">
-								<label class="form-check-label" for="chk_filtro_enabled">Incluir usuarios deshabilitados</label>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-8">
-							<div class="input-group mb-3">
-								<span class="input-group-text" id="lbl_span_searchtext">buscar:</span>
-								<input type="text" class="form-control" id="lbl_searchtext" placeholder="ingrese nombre o email" aria-label="searchtext" aria-describedby="lbl_span_searchtext">
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-4">
-						<div class="input-group mb-1">
-							<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal_new_usuario">Registrar usuario</button>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<table id="table_usuario" class="table table-striped"></table><br>
-					</div>
-				</div>
-			</div>
-			
-		</div>
-		
-		<!-- Modal -->
-		<div class="modal fade" id="modal_new_usuario" tabindex="-1" data-bs-backdrop="static"
-			aria-labelledby="modal-titulo_new_usuario" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="modal-titulo_new_usuario">Nuevo Usuario</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<form>
-						<div class="mb-3 row">
-							<label for="lbl_nombre" class="col-sm-3 col-form-label">Nombre</label>
-							<div class="col-sm-9">
-								<input type="text" class="form-control" id="lbl_nombre" placeholder="Escriba el nombre del usuario">
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label for="lbl_email" class="col-sm-3 col-form-label">Email</label>
-							<div class="col-sm-9">
-								<input type="text" class="form-control" id="lbl_email" placeholder="Ej. usuario@electrotel.cl">
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label for="lbl_password" class="col-sm-3 col-form-label">Contraseña</label>
-							<div class="col-sm-9">
-								<input type="password" class="form-control" id="lbl_password" placeholder="Escriba una contraseña">
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label for="lbl_password_re"
-								class="col-sm-3 col-form-label">Repetir contraseña</label>
-							<div class="col-sm-9">
-								<input type="password" class="form-control"
-									id="lbl_password_re" placeholder="Repita la contraseña">
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label for="sel_role" class="col-sm-3 col-form-label">Perfil</label>
-							<div class="col-sm-9">
-								<select class="form-control form-control-sm" id="sel_role">
-									<option value="-1">-- Seleccione Perfil --</option>
-									<option value="ROLE_USER">Usuario</option>
-									<option value="ROLE_ADMIN">Administrador</option>
-								</select>
-							</div>
-						</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">Cancelar</button>
-						<button type="button" class="btn btn-primary">Aceptar</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		<th:block th:replace="~{fragments/forefront :: import-forefront}" />
-	</div>
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-		var listaUsuario = /*[[${listaUsuario}]]*/[];
-	/*]]>*/
-	</script>
-</body>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
 
+    <!-- CSS / JS globales -->
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+
+    <!-- JS propio -->
+    <script th:src="@{/listaUsuario.js}"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url('/img/fondo_acreditacion.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 1.5rem;
+            padding-bottom: 2rem;
+            backdrop-filter: blur(3px);
+        }
+
+        .card-usuario {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 1.5rem 1.75rem;
+        }
+
+        .title-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(13,110,253,0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+        }
+
+        .title-icon i {
+            font-size: 1.3rem;
+            color: #0d6efd;
+        }
+
+        .table-section-title {
+            font-size: .9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: .08em;
+        }
+
+        .modal-content {
+            border-radius: 1rem;
+            background: rgba(255,255,255,0.97);
+        }
+
+        .modal-header,
+        .modal-footer {
+            border-color: rgba(148,163,184,0.35);
+        }
+
+        /* ✅ Eliminar cortina gris y que NO capture clics */
+        .modal-backdrop.show {
+            opacity: 0 !important;
+            background-color: transparent !important;
+            pointer-events: none !important;  /* <- clave para que no se pegue */
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container page-wrapper">
+
+    <!-- Menú -->
+    <th:block th:replace="~{fragments/menu :: import-menu}" />
+
+    <!-- Card principal -->
+    <div class="card card-usuario mt-3">
+
+        <!-- Título -->
+        <div class="d-flex align-items-center mb-3">
+            <div class="title-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div>
+                <h5 class="mb-0">Gestión de Usuarios</h5>
+                <small class="text-muted">Administración de cuentas, roles y estados.</small>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="row mb-3">
+            <div class="col-sm-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chk_filtro_enabled"
+                           role="switch">
+                    <label class="form-check-label" for="chk_filtro_enabled">
+                        Incluir usuarios deshabilitados
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buscador -->
+        <div class="row mb-3">
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <span class="input-group-text" id="lbl_span_searchtext">Buscar:</span>
+                    <input type="text"
+                           class="form-control"
+                           id="lbl_searchtext"
+                           placeholder="Ingrese nombre o email"
+                           aria-label="searchtext"
+                           aria-describedby="lbl_span_searchtext">
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón registrar -->
+        <div class="mb-3">
+            <button type="button"
+                    class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modal_new_usuario">
+                <i class="bi bi-person-plus-fill me-1"></i>
+                Registrar usuario
+            </button>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table id="table_usuario"
+                   class="table table-striped table-hover table-sm align-middle mb-0"></table>
+        </div>
+
+    </div>
+
+    <!-- Modal: Nuevo Usuario -->
+    <div class="modal fade"
+         id="modal_new_usuario"
+         tabindex="-1"
+         aria-labelledby="modal-titulo_new_usuario"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-titulo_new_usuario">Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+
+                        <div class="mb-3 row">
+                            <label for="lbl_nombre" class="col-sm-3 col-form-label">Nombre</label>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="lbl_nombre"
+                                       class="form-control"
+                                       placeholder="Nombre del usuario">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="lbl_email" class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="lbl_email"
+                                       class="form-control"
+                                       placeholder="usuario@dominio.cl">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="lbl_password" class="col-sm-3 col-form-label">Contraseña</label>
+                            <div class="col-sm-9">
+                                <input type="password"
+                                       id="lbl_password"
+                                       class="form-control"
+                                       placeholder="Contraseña">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="lbl_password_re" class="col-sm-3 col-form-label">Repetir</label>
+                            <div class="col-sm-9">
+                                <input type="password"
+                                       id="lbl_password_re"
+                                       class="form-control"
+                                       placeholder="Repita la contraseña">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="sel_role" class="col-sm-3 col-form-label">Perfil</label>
+                            <div class="col-sm-9">
+                                <select id="sel_role" class="form-control form-control-sm">
+                                    <option value="-1">-- Seleccione Perfil --</option>
+                                    <option value="ROLE_USER">Usuario</option>
+                                    <option value="ROLE_ADMIN">Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button"
+                            class="btn btn-primary">
+                        Aceptar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts extra -->
+    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
+
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var listaUsuario = /*[[${listaUsuario}]]*/[];
+    /*]]>*/
+</script>
+
+</body>
 </html>

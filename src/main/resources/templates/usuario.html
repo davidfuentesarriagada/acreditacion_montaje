@@ -1,72 +1,173 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-<meta charset="UTF-8">
-<title th:text="@{'Usuario ' + ${usuario.nombre}}">Usuario</title>
-<th:block th:replace="~{fragments/css :: import-css}" />
-<th:block th:replace="~{fragments/js :: import-js}" />
-<script th:src="@{/usuario.js}"></script>
-</head>
-<body>
-	<div class="container">
-		<th:block th:replace="~{fragments/menu :: import-menu}" />
-		<div class="row">
-			<div class="card">
-				<div class="card-body">
-					<h5 class="card-title">Usuario</h5>
-					<form th:with="usuario=${usuario}">
-						<div class="form-group row">
-							<label for="lbl_nombre" class="col-sm-3 col-form-label">Nombre</label>
-							<div class="col-sm-4">
-								<input type="text" class="form-control" id="lbl_nombre" th:value="${usuario.nombre}">
-							</div>
-						</div>
-						<div class="form-group row">
-							<label for="lbl_email" class="col-sm-3 col-form-label">Email</label>
-							<div class="col-sm-4">
-								<input type="email" class="form-control" id="lbl_email" th:value="${usuario.email}">
-							</div>
-						</div>
-						<div class="form-group row">
-							<label for="lbl_password" class="col-sm-3 col-form-label">Asignar nueva contraseña</label>
-							<div class="col-sm-4">
-								<input type="password" class="form-control" id="lbl_password" placeholder="Dejar en blanco para mantenerla">
-							</div>
-						</div>
-						<div class="form-group row">
-							<label for="lbl_password_re"
-								class="col-sm-3 col-form-label">Repetir nueva contraseña</label>
-							<div class="col-sm-4">
-								<input type="password" class="form-control"
-									id="lbl_password_re" placeholder="Repita la contraseña">
-							</div>
-						</div>
-						<div class="form-group row">
-							<label for="sel_role" class="col-sm-3 col-form-label">Perfil</label>
-							<div class="col-sm-4">
-								<select id="sel_role" class="form-control form-control-sm">
-									<option value="ROLE_USER" th:selected="(${usuario.role == 'ROLE_USER'})">Usuario</option>
-									<option value="ROLE_ADMIN" th:selected="(${usuario.role == 'ROLE_ADMIN'})">Administrador</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="form-check-label col-sm-3" for="chk_enabled">Habilitado</label>
-							<div class="form-check form-switch col-sm-4">
-								<input class="form-check-input" type="checkbox" id="chk_enabled" th:checked="${usuario.enabled}">
-							</div>
-						</div>
-						
-					</form>
-				</div>
-				<div class="card-footer">
-					<a class="btn btn-secondary btn-sm" role="button" th:href="@{/listaUsuario}">Volver al listado</a>
-					<button type="button" class="btn btn-primary btn-sm botonForm" id="btn_guardar">Guardar</button>
-				</div>
-			</div>
-		</div>
-		<th:block th:replace="~{fragments/forefront :: import-forefront}" />
-	</div>
-</body>
+    <meta charset="UTF-8">
+    <title th:text="@{'Usuario - ' + ${usuario.nombre}}">Usuario</title>
 
+    <!-- CSS / JS globales -->
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+
+    <!-- SweetAlert2 SIEMPRE -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- JS propio -->
+    <script th:src="@{/usuario.js}"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url('/img/fondo_acreditacion.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 1.5rem;
+            padding-bottom: 2rem;
+            backdrop-filter: blur(3px);
+        }
+
+        .card-user {
+            background: rgba(255,255,255,0.92);
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.45);
+            padding: 1.5rem 1.75rem;
+        }
+
+        .title-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(13,110,253,0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+        }
+
+        .title-icon i {
+            font-size: 1.3rem;
+            color: #0d6efd;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: .6rem;
+        }
+
+        .card-footer {
+            border-top: 1px solid rgba(148,163,184,0.35);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container page-wrapper">
+
+    <!-- Menú -->
+    <th:block th:replace="~{fragments/menu :: import-menu}" />
+
+    <!-- CARD PRINCIPAL -->
+    <div class="card card-user mt-3">
+
+        <!-- TÍTULO -->
+        <div class="d-flex align-items-center mb-3">
+            <div class="title-icon">
+                <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <div>
+                <h5 class="mb-0">Editar Usuario</h5>
+                <small class="text-muted">Modifique los datos del usuario seleccionado.</small>
+            </div>
+        </div>
+
+        <!-- FORMULARIO -->
+        <form th:with="usuario=${usuario}">
+
+            <div class="row mb-3">
+                <label for="lbl_nombre" class="col-sm-3 col-form-label">Nombre</label>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" id="lbl_nombre"
+                           th:value="${usuario.nombre}">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="lbl_email" class="col-sm-3 col-form-label">Email</label>
+                <div class="col-sm-5">
+                    <input type="email" class="form-control" id="lbl_email"
+                           th:value="${usuario.email}">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="lbl_password" class="col-sm-3 col-form-label">Nueva contraseña</label>
+                <div class="col-sm-5">
+                    <input type="password" class="form-control" id="lbl_password"
+                           placeholder="Dejar en blanco para mantenerla">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="lbl_password_re" class="col-sm-3 col-form-label">Repetir contraseña</label>
+                <div class="col-sm-5">
+                    <input type="password" class="form-control" id="lbl_password_re"
+                           placeholder="Repita la contraseña">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="sel_role" class="col-sm-3 col-form-label">Perfil</label>
+                <div class="col-sm-5">
+                    <select id="sel_role" class="form-select form-select-sm">
+                        <option value="ROLE_USER"
+                                th:selected="${usuario.role == 'ROLE_USER'}">Usuario</option>
+                        <option value="ROLE_ADMIN"
+                                th:selected="${usuario.role == 'ROLE_ADMIN'}">Administrador</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-3 col-form-label">Habilitado</label>
+                <div class="col-sm-5 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox"
+                               id="chk_enabled" th:checked="${usuario.enabled}">
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- FOOTER BOTONES -->
+        <div class="card-footer d-flex justify-content-between">
+            <a class="btn btn-secondary btn-sm" th:href="@{/listaUsuario}">
+                <i class="bi bi-arrow-left-circle me-1"></i> Volver
+            </a>
+            <button type="button" class="btn btn-primary btn-sm" id="btn_guardar">
+                <i class="bi bi-check-circle me-1"></i> Guardar
+            </button>
+        </div>
+
+    </div>
+
+    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
+
+</div>
+
+</body>
 </html>

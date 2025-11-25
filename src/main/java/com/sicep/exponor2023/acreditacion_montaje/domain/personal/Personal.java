@@ -36,6 +36,8 @@ public class Personal extends Auditable implements PersonalScanQrDTO {
 	private String nombre;
 	@Column(length = 30)
 	private String rut;// rut sin digito verificador
+	@Column(length = 30)
+	private String nacionalidad;
 	private boolean extranjero = false;
 	
     @ManyToMany(fetch = FetchType.EAGER)
@@ -83,6 +85,11 @@ public class Personal extends Auditable implements PersonalScanQrDTO {
 		if (extranjero)
 			return null;
 		return FormatoCampos.getDigitoVerificador(rut);
+	}
+
+	public boolean isExtranjero() {
+		if(this.rut.contains("EXT")) return true;
+		return false;
 	}
 
 }

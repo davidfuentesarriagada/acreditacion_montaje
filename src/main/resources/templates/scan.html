@@ -1,98 +1,98 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Escaneo código QR</title>
-<th:block th:replace="~{fragments/css :: import-css}" />
-<th:block th:if="${@environment.getProperty('propiedad.printTicket')}" th:replace="~{fragments/css :: import-print-css}" />
-<th:block th:replace="~{fragments/js :: import-js}" />
-<th:block th:if="${@environment.getProperty('propiedad.printTicket')}" th:replace="~{fragments/js :: import-print-js}" />
-<script th:src="@{/scan.js}"></script>
-<script th:src="@{/busquedaManual.js}" th:if="${@environment.getProperty('propiedad.printTicket')}"></script>
+    <meta charset="UTF-8">
+    <title>Escaneo código QR</title>
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:if="${@environment.getProperty('propiedad.printTicket')}" th:replace="~{fragments/css :: import-print-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+    <th:block th:if="${@environment.getProperty('propiedad.printTicket')}" th:replace="~{fragments/js :: import-print-js}" />
+    <script th:src="@{/scan.js}"></script>
+    <script th:src="@{/busquedaManual.js}" th:if="${@environment.getProperty('propiedad.printTicket')}"></script>
 </head>
 <body>
-	<div class="container">
-		<th:block th:replace="~{fragments/menu :: import-menu}" />
-		<div class="row">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-4">
-						<input id="lbl_scan_codigo" class="form-control" type="text" placeholder="Escanee aquí el código QR con la pistola">
-					</div>
-				</div>
-				<div class="row">
-					<div class="accordion" id="accordion">
-						<!-- div asociado a la webcam -->
-						<div class="accordion-item">
-							<h2 class="accordion-header">
-								<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion_webcam_collapsed" 
-								aria-expanded="true" aria-controls="accordion_webcam_collapsed">Escaneo por webcam</button>
-							</h2>
-							<div id="accordion_webcam_collapsed" class="accordion-collapse collapse show" data-bs-parent="#accordion">
-								<div class="accordion-body">
-									<div style="width: 500px" id="reader"></div>
-								</div>
-							</div>
-						</div>
-						<!-- div asociado al resultado -->
-						<div class="container">
-							<div class="row d-none" id="result_ok_printed">
-								<div class="alert alert-danger col-sm-6" role="alert">
-									El ticket ha sido impreso anteriormente
-								</div>
-							</div>
-							<div class="row d-none" id="result_ok">
-								<div class="col-sm-4 result"></div>
-								<div class="col-sm-4 print" th:if="${@environment.getProperty('propiedad.printTicket')}">
-									<a class="btn btn-primary btn-sm" role="button" href="#"
-											th:attr="onclick=|initPrintTicket()|">
-										<svg class="bi" width="16" height="16" fill="currentColor">
-											<use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer}"></use>
-										</svg>
-										<span>Volver a Imprimir</span>
-									</a>
-								</div>
-							</div>
-							<div class="row d-none" id="result_no_ok">
-								<div class="col-sm-4">
-									<img th:src="@{'/images/ticket_error.png'}" width="239" height="100">
-								</div>
-							</div>
-						</div>
-						<!-- div asociado a la busqueda manual -->
-						<div class="accordion-item" th:if="${@environment.getProperty('propiedad.printTicket')}">
-							<h2 class="accordion-header">
-								<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion_manual_collapsed" 
-								aria-expanded="true" aria-controls="accordion_manual_collapsed">Búsqueda manual</button>
-							</h2>
-							<div id="accordion_manual_collapsed" class="accordion-collapse collapse" data-bs-parent="#accordion">
-								<div class="accordion-body">
-									<div class="row">
-										<div class="col-sm-4">
-											<input type="text" class="form-control" id="lbl_searchtext" placeholder="búsqueda por código, nombre o rut" aria-label="searchtext" aria-describedby="lbl_span_searchtext">
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-sm-12">
-											<table id="table_personal" style="width: 100%" class="table table-striped"></table>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<th:block th:replace="~{fragments/forefront :: import-forefront}" />
-	</div>
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-		let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket')}]]*/false;
-		let marcaAsistenciaHabilitado = /*[[${@environment.getProperty('propiedad.ver.marca-asistencia')}]]*/false;
-	/*]]>*/
-	</script>
+<div class="container">
+    <th:block th:replace="~{fragments/menu :: import-menu}" />
+    <div class="row">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4">
+                    <input id="lbl_scan_codigo" class="form-control" type="text" placeholder="Escanee aquí el código QR con la pistola">
+                </div>
+            </div>
+            <div class="row">
+                <div class="accordion" id="accordion">
+                    <!-- div asociado a la webcam -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion_webcam_collapsed"
+                                    aria-expanded="true" aria-controls="accordion_webcam_collapsed">Escaneo por webcam</button>
+                        </h2>
+                        <div id="accordion_webcam_collapsed" class="accordion-collapse collapse show" data-bs-parent="#accordion">
+                            <div class="accordion-body">
+                                <div style="width: 500px" id="reader"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- div asociado al resultado -->
+                    <div class="container">
+                        <div class="row d-none" id="result_ok_printed">
+                            <div class="alert alert-danger col-sm-6" role="alert">
+                                El ticket ha sido impreso anteriormente
+                            </div>
+                        </div>
+                        <div class="row d-none" id="result_ok">
+                            <div class="col-sm-4 result"></div>
+                            <div class="col-sm-4 print" th:if="${@environment.getProperty('propiedad.printTicket')}">
+                                <a class="btn btn-primary btn-sm" role="button" href="#"
+                                   th:attr="onclick=|initPrintTicket()|">
+                                    <svg class="bi" width="16" height="16" fill="currentColor">
+                                        <use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer}"></use>
+                                    </svg>
+                                    <span>Volver a Imprimir</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row d-none" id="result_no_ok">
+                            <div class="col-sm-4">
+                                <img th:src="@{'/images/ticket_error.png'}" width="239" height="100">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- div asociado a la busqueda manual -->
+                    <div class="accordion-item" th:if="${@environment.getProperty('propiedad.printTicket')}">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion_manual_collapsed"
+                                    aria-expanded="true" aria-controls="accordion_manual_collapsed">Búsqueda manual</button>
+                        </h2>
+                        <div id="accordion_manual_collapsed" class="accordion-collapse collapse" data-bs-parent="#accordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="lbl_searchtext" placeholder="búsqueda por código, nombre o rut" aria-label="searchtext" aria-describedby="lbl_span_searchtext">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table id="table_personal" style="width: 100%" class="table table-striped"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket')}]]*/false;
+    let marcaAsistenciaHabilitado = /*[[${@environment.getProperty('propiedad.ver.marca-asistencia')}]]*/false;
+    /*]]>*/
+</script>
 </body>
 
 </html>

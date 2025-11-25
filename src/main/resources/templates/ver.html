@@ -1,87 +1,288 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
 <head>
-<meta charset="UTF-8">
-<title th:text="${personal.nombre}"></title>
-<th:block th:replace="~{fragments/css :: import-css}" />
-<th:block th:replace="~{fragments/js :: import-js}" />
-<link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
-<script th:src="@{/print.min.js}"></script>
-<script th:src="@{/ver.js}"></script>
+    <meta charset="UTF-8">
+    <title th:text="${personal.nombre}">Detalle de personal</title>
+
+    <!-- CSS / JS globales -->
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+
+    <!-- (Opcional) Bootstrap Icons, por si no vienen en el fragmento -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}"/>
+
+    <!-- Estilos y scripts de impresión -->
+    <link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
+    <script th:src="@{/print.min.js}"></script>
+
+    <!-- JS propio de esta vista -->
+    <script th:src="@{/ver.js}"></script>
+
+    <style>
+        /* Fondo general de la página */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url('/img/fondo_acreditacion.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        /* Capa con blur suave */
+        .page-wrapper {
+            min-height: 100vh;
+            padding: 1.5rem 0 2.5rem 0;
+            backdrop-filter: blur(3px);
+        }
+
+        /* Card principal */
+        .card-ver {
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 1rem;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .card-ver .card-header {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .title-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(13, 110, 253, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+        }
+
+        .title-icon i {
+            color: #0d6efd;
+            font-size: 1.25rem;
+        }
+
+        .badge-estado {
+            font-size: .75rem;
+        }
+
+        dl.row dt {
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-	<div class="container">
-		<th:block th:replace="~{fragments/menu :: import-menu}"/>
-		<div class="row">
-			<div class="row">
-				<div class="alert alert-danger col-sm-6" th:if="${personal.fechaImpresionTicket != null}" role="alert">
-					El ticket ha sido impreso anteriormente
-				</div>
-			</div>
-			<dl class="row">
-				<dt class="col-sm-3">Código</dt>
-				<dd class="col-sm-9" th:text="${personal.codigo}"></dd>
-				<dt class="col-sm-3">Nombre</dt>
-				<dd class="col-sm-9" th:text="${personal.nombre}"></dd>
-				
-				<dt class="col-sm-3">Expositor(es)</dt>
-				<dd class="col-sm-9"></dd>
-			</dl>
-			<dl class="row" th:each="expositor : ${personal.listaExpositor}">
-				<dt class="col-sm-3"></dt>
-				<dd class="col-sm-9">
-					<span th:text="|${expositor.nombre} - ${expositor.email}|"></span>
-					<a class="btn btn-primary btn-sm" role="button" href="#" 
-						th:attr="onclick=|sendEmail('${expositor.id}')|">
-							<svg class="bi" width="14" height="14" fill="currentColor">
-								<use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#envelope}"></use>
-							</svg>
-					</a>
-				</dd>
-			</dl>
-			<dl class="row">
-				<dt class="col-sm-3">Rut</dt>
-				<dd class="col-sm-9" th:text="${personal.rutCompleto}"></dd>
-				<dt class="col-sm-3">Fecha envío email QR</dt>
-				<dd class="col-sm-9" th:if="${personal.fechaEnvioCredenciales == null}">No se ha enviado</dd>
-				<dd class="col-sm-9" th:unless="${personal.fechaEnvioCredenciales == null}" th:text="${personal.fechaEnvioCredenciales}"></dd>
-				<dt class="col-sm-3">¿Ticket impreso?</dt>
-				<dd class="col-sm-9" th:if="${personal.fechaImpresionTicket == null}">NO</dd>
-				<dd class="col-sm-9 text-success" th:unless="${personal.fechaImpresionTicket == null}">SI</dd>
-				<dt class="col-sm-3">Observaciones</dt>
-				<dd class="col-sm-9" th:text="${personal.observaciones}"></dd>
-			</dl>
-		</div>
-		<div class="row">
-			<div class="col-sm-6">
-				<img th:src="@{'/personal/ticket/'+${personal.codigo}+'.png'}" width="239" height="100">
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-10">
-				<a class="btn btn-primary btn-sm" role="button" href="#" 
-				th:attr="onclick=|initPrintTicket()|">
-					<svg class="bi" width="16" height="16" fill="currentColor">
-						<use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer}"></use>
-					</svg>
-					<span th:if="${personal.fechaImpresionTicket == null}">Imprimir</span>
-					<span th:if="${personal.fechaImpresionTicket != null}">Volver a Imprimir</span>
-				</a>
-				<button id="btn_generate_images" class="btn btn-primary btn-sm" role="button" sec:authorize="hasRole('ADMIN')"
-					th:unless="${personal.fechaImpresionTicket == null}" >Recrear QR, ticket y plantilla</button>
-				<button id="btn_delete" type="button" class="btn btn-danger btn-sm pull-right">Eliminar</button>
-				<a class="btn btn-secondary btn-sm" role="button" th:href="@{/listaPersonal}">Volver al listado</a>
-			</div>
-		</div>
-		<th:block th:replace="~{fragments/forefront :: import-forefront}"/>
-	</div>
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-		var codigo = /*[[${personal.codigo}]]*/null;
-		var fechaImpresion = /*[[${personal.fechaImpresionTicket}]]*/null;
-		let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket') == 'true'}]]*/false;
-	/*]]>*/
-	</script>
-</body>
 
+<div class="page-wrapper">
+    <div class="container-lg">
+
+        <!-- Menú -->
+        <th:block th:replace="~{fragments/menu :: import-menu}"/>
+
+        <!-- Card principal -->
+        <div class="card card-ver mt-3">
+            <div class="card-header bg-transparent py-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                    <!-- Título -->
+                    <div class="d-flex align-items-center">
+                        <div class="title-icon">
+                            <i class="bi bi-person-vcard-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">
+                                Detalle de personal:
+                                <span class="text-primary" th:text="${personal.nombre}">Nombre</span>
+                            </h5>
+                            <small class="text-muted">
+                                Revise la información, estado de ticket y credenciales QR.
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Código + estado impresión -->
+                    <div class="text-end">
+                        <div class="mb-1">
+                            <span class="badge bg-light text-secondary border badge-estado">
+                                Código:
+                                <span th:text="${personal.codigo}">0000</span>
+                            </span>
+                        </div>
+                        <div th:if="${personal.fechaImpresionTicket != null}"
+                             class="badge bg-danger-subtle text-danger border badge-estado">
+                            Ticket impreso anteriormente
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+                    <!-- Columna datos -->
+                    <div class="col-lg-7">
+
+                        <!-- Alert original (por compatibilidad) -->
+                        <div class="row mb-2">
+                            <div class="alert alert-danger col-sm-12"
+                                 th:if="${personal.fechaImpresionTicket != null}"
+                                 role="alert">
+                                El ticket ha sido impreso anteriormente
+                            </div>
+                        </div>
+
+                        <!-- Datos principales -->
+                        <dl class="row mb-3">
+                            <dt class="col-sm-4 col-md-3">Código</dt>
+                            <dd class="col-sm-8 col-md-9" th:text="${personal.codigo}"></dd>
+
+                            <dt class="col-sm-4 col-md-3">Nombre</dt>
+                            <dd class="col-sm-8 col-md-9" th:text="${personal.nombre}"></dd>
+
+                            <dt class="col-sm-4 col-md-3">Rut</dt>
+                            <dd class="col-sm-8 col-md-9" th:text="${personal.rutCompleto}"></dd>
+
+                            <dt class="col-sm-4 col-md-3">Fecha envío email QR</dt>
+                            <dd class="col-sm-8 col-md-9" th:if="${personal.fechaEnvioCredenciales == null}">
+                                No se ha enviado
+                            </dd>
+                            <dd class="col-sm-8 col-md-9"
+                                th:unless="${personal.fechaEnvioCredenciales == null}"
+                                th:text="${personal.fechaEnvioCredenciales}">
+                            </dd>
+
+                            <dt class="col-sm-4 col-md-3">¿Ticket impreso?</dt>
+                            <dd class="col-sm-8 col-md-9" th:if="${personal.fechaImpresionTicket == null}">
+                                NO
+                            </dd>
+                            <dd class="col-sm-8 col-md-9 text-success"
+                                th:unless="${personal.fechaImpresionTicket == null}">
+                                SI
+                            </dd>
+
+                            <dt class="col-sm-4 col-md-3">Observaciones</dt>
+                            <dd class="col-sm-8 col-md-9" th:text="${personal.observaciones}"></dd>
+                        </dl>
+
+                        <!-- Expositores -->
+                        <div class="mb-2">
+                            <h6 class="mb-1">
+                                <i class="bi bi-people-fill me-1 text-secondary"></i>
+                                Expositor(es)
+                            </h6>
+                        </div>
+
+                        <dl class="row mb-0" th:each="expositor : ${personal.listaExpositor}">
+                            <dt class="col-sm-3"></dt>
+                            <dd class="col-sm-9 d-flex align-items-center gap-2">
+                                <span th:text="|${expositor.nombre} - ${expositor.email}|"></span>
+                                <a class="btn btn-outline-primary btn-sm"
+                                   role="button"
+                                   href="#"
+                                   th:attr="onclick=|sendEmail('${expositor.id}')|">
+                                    <svg class="bi" width="14" height="14" fill="currentColor">
+                                        <use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#envelope}"></use>
+                                    </svg>
+                                </a>
+                            </dd>
+                        </dl>
+
+                    </div>
+
+                    <!-- Columna ticket / QR -->
+                    <div class="col-lg-5 mt-4 mt-lg-0">
+                        <div class="border rounded-3 p-3 bg-light-subtle h-100 d-flex flex-column justify-content-between">
+                            <div class="mb-3">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-qr-code-scan me-1 text-secondary"></i>
+                                    Ticket / QR
+                                </h6>
+                                <p class="small text-muted mb-3">
+                                    Este es el ticket actual asociado al código de la persona.
+                                </p>
+                                <div class="text-center">
+                                    <img th:src="@{'/personal/ticket/'+${personal.codigo}+'.png'}"
+                                         width="239"
+                                         height="100"
+                                         class="img-fluid border rounded shadow-sm bg-white">
+                                </div>
+                            </div>
+                            <div class="small text-muted">
+                                Si se recrea el QR o el ticket, asegúrese de reimprimir la credencial correspondiente.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer de acciones -->
+            <div class="card-footer bg-transparent">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                    <div class="small text-muted">
+                        Acciones disponibles: impresión de ticket, recreación de QR y eliminación de registro.
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <!-- Imprimir -->
+                        <a class="btn btn-primary btn-sm"
+                           role="button"
+                           href="#"
+                           th:attr="onclick=|initPrintTicket()|">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer}"></use>
+                            </svg>
+                            <span th:if="${personal.fechaImpresionTicket == null}">Imprimir</span>
+                            <span th:if="${personal.fechaImpresionTicket != null}">Volver a Imprimir</span>
+                        </a>
+
+                        <!-- Recrear QR / ticket -->
+                        <button id="btn_generate_images"
+                                class="btn btn-outline-primary btn-sm"
+                                role="button"
+                                sec:authorize="hasRole('ADMIN')"
+                                th:unless="${personal.fechaImpresionTicket == null}">
+                            Recrear QR, ticket y plantilla
+                        </button>
+
+                        <!-- Eliminar -->
+                        <button id="btn_delete"
+                                type="button"
+                                class="btn btn-danger btn-sm">
+                            Eliminar
+                        </button>
+
+                        <!-- Volver -->
+                        <a class="btn btn-outline-secondary btn-sm"
+                           role="button"
+                           th:href="@{/listaPersonal}">
+                            Volver al listado
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Forefront -->
+        <th:block th:replace="~{fragments/forefront :: import-forefront}"/>
+
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var codigo = /*[[${personal.codigo}]]*/ null;
+    var fechaImpresion = /*[[${personal.fechaImpresionTicket}]]*/ null;
+    let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket') == 'true'}]]*/ false;
+    /*]]>*/
+</script>
+
+</body>
 </html>

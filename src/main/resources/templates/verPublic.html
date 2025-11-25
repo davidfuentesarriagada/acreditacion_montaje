@@ -1,39 +1,125 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
-<head>
-	<meta charset="UTF-8">
-	<title th:text="${personal.nombre}"></title>
-	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
-	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}"/>
-	<style type="text/css">
-		.clickleable {
-			cursor: pointer;
-			margin: 15px 0;
-		}
-	</style>
-	<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
-</head>
-<body>
-	<div class="container">
-		<div class="row">
-			<h2>Acreditación de personal de montaje y desmontaje</h2>
-		</div>
-		<div class="row">
-			<dl class="row">
-				<dt class="col-sm-3">Código</dt>
-				<dd class="col-sm-9" th:text="${personal.codigo}"></dd>
-				<dt class="col-sm-3">Nombre</dt>
-				<dd class="col-sm-9" th:text="${personal.nombre}"></dd>
-                <dt class="col-sm-3">RUT</dt>
-                <dd class="col-sm-9" th:text="${personal.rut + '-' + personal.getDigitoVerificador()}"></dd>
-			</dl>
-		</div>
-		<div class="row">
-			<div class="col-sm-6">
-				<img th:src="@{'/personal/plantilla/'+${personal.codigo}+'.jpg'}" width="239" height="318">
-			</div>
-		</div>
-	</div>
-</body>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="es">
 
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${personal.nombre}">Acreditación</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}">
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+
+    <style>
+        body {
+            background: #f1f5f9;
+            font-family: "Segoe UI", system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .card-public {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title-main {
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: .08em;
+            color: #475569;
+            margin-bottom: 1rem;
+        }
+
+        dl dt {
+            font-weight: 600;
+            font-size: .85rem;
+        }
+
+        dl dd {
+            font-size: .95rem;
+            margin-bottom: .5rem;
+        }
+
+        .qr-container img {
+            border-radius: 0.75rem;
+            max-width: 260px;
+            width: 100%;
+            height: auto;
+            box-shadow: 0 10px 18px rgba(0,0,0,0.2);
+        }
+
+        .label-qr {
+            margin-top: .3rem;
+            font-size: .8rem;
+            color: #6b7280;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                display: block;
+            }
+            .card-public {
+                box-shadow: none !important;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card-public">
+
+    <div class="title-main">Acreditación de personal de montaje y desmontaje</div>
+
+    <h3 class="fw-bold mb-3" th:text="${personal.nombre}">Nombre</h3>
+
+    <dl class="row text-start mb-3">
+
+        <!-- ✅ Nombre -->
+        <dt class="col-4">Nombre</dt>
+        <dd class="col-8" th:text="${personal.nombre}"></dd>
+
+        <!-- ✅ RUT (si es extranjero mostramos EXT o pasaporte) -->
+        <dt class="col-4">RUT</dt>
+        <dd class="col-8"
+            th:text="${personal.extranjero} ? ${personal.rut} + ' (EXT)' : ${personal.rutCompleto}">
+        </dd>
+
+        <!-- ✅ Nacionalidad -->
+        <dt class="col-4">Nacionalidad</dt>
+        <dd class="col-8"
+            th:text="${personal.nacionalidad} ?: 'No registrada'">
+        </dd>
+
+        <!-- ✅ Empresa -->
+        <dt class="col-4">Empresa</dt>
+        <dl class="row" th:each="expositor : ${personal.listaExpositor}">
+            <dt class="col-sm-3"></dt>
+            <dd class="col-sm-9" th:text="${expositor.nombre}"></dd>
+        </dl>
+
+    </dl>
+
+    <div class="qr-container mt-4">
+        <img th:src="@{'/personal/plantilla/'+${personal.codigo}+'.jpg'}"
+             alt="QR acreditación">
+        <div class="label-qr">Muestre esta tarjeta para validar su acreditación</div>
+    </div>
+
+</div>
+
+</body>
 </html>

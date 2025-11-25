@@ -1,27 +1,109 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<meta charset="UTF-8">
-		<title>Exportación de la asistencia registrada del personal de montaje</title>
-		<th:block th:replace="~{fragments/css :: import-css}" />
-		<th:block th:replace="~{fragments/js :: import-js}" />
-		<script th:src="@{/exportarAsistencia.js}"></script>
-	</head>
-	<body>
-		<div class="container">
-			<th:block th:replace="~{fragments/menu :: import-menu}" />
-			<div class="row">
-				<div class="container">
-					<div class="row">
-						<div class="col-sm-4">
-							<button type="button" class="btn btn-success btn-sm" id="btn_export">Exportar asistencia</button>
-						</div>
-					</div>
-				</div>
-				
-			</div>
-			<th:block th:replace="~{fragments/forefront :: import-forefront}" />
-		</div>
-	</body>
+<head>
+    <meta charset="UTF-8">
+    <title>Exportación de asistencia – Personal de montaje</title>
 
+    <!-- CSS / JS globales -->
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+
+    <!-- JS propio -->
+    <script th:src="@{/exportarAsistencia.js}"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url('/img/fondo_acreditacion.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 1.5rem;
+            padding-bottom: 2rem;
+        }
+
+        .card-export {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.55);
+            padding: 1.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .title-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(25, 135, 84, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+        }
+
+        .title-icon i {
+            color: #198754;
+            font-size: 1.3rem;
+        }
+
+        .help-text {
+            font-size: .85rem;
+            color: #6b7280;
+        }
+
+        .btn-success {
+            padding-left: 1.2rem;
+            padding-right: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container page-wrapper">
+
+    <!-- Menú -->
+    <th:block th:replace="~{fragments/menu :: import-menu}" />
+
+    <!-- Card principal -->
+    <div class="card card-export">
+
+        <!-- Título y descripción -->
+        <div class="d-flex align-items-center mb-3">
+            <div class="title-icon">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+            </div>
+            <div>
+                <h5 class="mb-0">Exportar asistencia del personal</h5>
+                <div class="help-text">
+                    Descargue un archivo Excel con el registro completo de asistencia de montaje.
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón -->
+        <div class="mt-3">
+            <button type="button"
+                    class="btn btn-success btn-sm"
+                    id="btn_export">
+                <i class="bi bi-download me-1"></i>
+                Exportar asistencia
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Scripts adicionales -->
+    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
+
+</div>
+
+</body>
 </html>

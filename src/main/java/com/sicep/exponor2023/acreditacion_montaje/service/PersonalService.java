@@ -141,6 +141,7 @@ public class PersonalService {
 			personal.getListaExpositor().add(expositor);
 			personal.setExtranjero(dto.isExtranjero());
 			personal.setObservaciones(dto.getObservaciones());
+			personal.setNacionalidad(dto.getNacionalidad());
 			
 			// creacion o asignacion de codigo
 			personal.setCodigo(dto.getCodigo() == null ? generateCodigo4() : dto.getCodigo());

@@ -1,99 +1,601 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Personal</title>
-<th:block th:replace="~{fragments/css :: import-css}" />
-<th:block th:replace="~{fragments/js :: import-js}" />
-<script th:src="@{/listaPersonal.js}"></script>
+    <meta charset="UTF-8">
+    <title>Personal</title>
+
+    <!-- CSS / JS globales (Bootstrap, etc.) -->
+    <th:block th:replace="~{fragments/css :: import-css}" />
+    <th:block th:replace="~{fragments/js :: import-js}" />
+
+    <!-- Bootstrap Icons (por si no vienen en el fragmento) -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}"/>
+
+    <!-- SweetAlert2 (puedes moverlo al fragmento JS si quieres global) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- JS propio de esta vista (carga la tabla, etc.) -->
+    <script th:src="@{/listaPersonal.js}"></script>
+
+    <style>
+        /* Fondo general de la página */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url('/img/fondo_acreditacion.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        /* Card principal */
+        .card-personal {
+            background: rgba(255, 255, 255, 0.90);
+            border-radius: 1rem;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-personal .card-header {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .card-personal .title-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(13, 110, 253, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+        }
+
+        .card-personal .title-icon i {
+            color: #0d6efd;
+            font-size: 1.25rem;
+        }
+
+        .btn-toolbar .btn {
+            white-space: nowrap;
+        }
+
+        .table-section-title {
+            font-size: .9rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Backdrop del modal, suave (solo cambiamos opacidad, no z-index) */
+        .modal-backdrop.show {
+            opacity: 0.15 !important;
+            background-color: rgba(0, 0, 0, 0.45);
+        }
+
+        .modal-content {
+            border-radius: 1rem;
+            background: rgba(255,255,255,0.97);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(148, 163, 184, 0.35);
+        }
+    </style>
 </head>
 <body>
-	<div class="container">
-		<th:block th:replace="~{fragments/menu :: import-menu}" />
-		<div class="row">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-4">
-						<div class="input-group mb-1">
-							<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal_new_personal">Registrar Personal</button>
-						</div>
-					</div>
-					<div class="col-sm-4">
-						<button type="button" class="btn btn-success btn-sm" id="btn_export_list">Exportar listado</button>
-					</div>
-					<div class="col-sm-4">
-						<button type="button" class="btn btn-success btn-sm" id="btn_plantilla_qr" sec:authorize="hasRole('DEVELOPER')">Generar plantilla QR</button>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<table id="table_personal" class="table table-striped"></table><br>
-					</div>
-				</div>
-			</div>
-			
-		</div>
-		
-		<!-- Modal -->
-		<div class="modal fade" id="modal_new_personal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modal-titulo_new_personal" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="modal-titulo_new_personal">Registrar Personal</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<form>
-							<div class="input-group mb-3">
-								<span class="input-group-text">* Nombre</span>
-								<input type="text" class="form-control" id="lbl_nombre">
-							</div>
-							<div class="input-group mb-3">
-								<div class="input-group-text">
-									<input class="form-check-input" type="radio" name="options" value="nacional" checked>
-								</div>
-								<label class="input-group-text">Nacional: Rut</label>
-								<input type="text" class="form-control" id="lbl_rut_nacional" placeholder="números, sin dígito verificador">
-								<label class="input-group-text" id="lbl_rut_nacional_dv">N.A.</label>
-							</div>
-							<div class="input-group mb-3">
-								<div class="input-group-text">
-									<input class="form-check-input" type="radio" name="options" value="extranjero">
-								</div>
-								<label class="input-group-text">Extranjero: Pasaporte</label>
-								<input type="text" class="form-control" id="lbl_pass_extranjero" placeholder="Alfanumérico">
-							</div>
 
-							<div class="input-group mb-3">
-								<span class="input-group-text">* Empresa</span>
-								<input type="text" class="form-control" id="lbl_empresa">
-							</div>
-							<div class="input-group mb-3">
-								<span class="input-group-text">Email</span>
-								<input type="text" class="form-control" id="lbl_email">
-							</div>
-							<div class="input-group mb-3">
-								<span class="input-group-text">Observaciones</span>
-								<textarea class="form-control" id="lbl_observaciones"></textarea>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="button" class="btn btn-primary">Guardar</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<th:block th:replace="~{fragments/forefront :: import-forefront}" />
-	</div>
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-		let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket')}]]*/false;
-		let marcaAsistenciaHabilitado = /*[[${@environment.getProperty('propiedad.ver.marca-asistencia')}]]*/false;
-	/*]]>*/
-	</script>
+<div class="container">
+
+    <!-- Menú / barra superior -->
+    <th:block th:replace="~{fragments/menu :: import-menu}" />
+
+    <!-- Card principal -->
+    <div class="card card-personal">
+        <div class="card-header bg-transparent py-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                <!-- Título y descripción -->
+                <div class="d-flex align-items-center">
+                    <div class="title-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Gestión de Personal</h5>
+                        <small class="text-muted">
+                            Listado de personas acreditadas y herramientas de administración.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="btn-toolbar gap-2">
+                    <button type="button"
+                            class="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal_new_personal">
+                        <i class="bi bi-person-plus-fill me-1"></i>
+                        Registrar personal
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-success btn-sm"
+                            id="btn_export_list">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+                        Exportar listado
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            id="btn_plantilla_qr"
+                            sec:authorize="hasRole('DEVELOPER')">
+                        <i class="bi bi-qr-code me-1"></i>
+                        Generar plantilla QR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Subtítulo tabla -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="table-section-title">Listado de personal</div>
+                    <small class="text-muted">Revise, filtre y gestione el personal acreditado.</small>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-responsive mt-3">
+                <table id="table_personal"
+                       class="table table-striped table-hover table-sm align-middle mb-0"></table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal: Registrar Personal -->
+    <div class="modal fade"
+         id="modal_new_personal"
+         tabindex="-1"
+         aria-labelledby="modal-titulo_new_personal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title mb-0" id="modal-titulo_new_personal">
+                            Registrar Personal
+                        </h5>
+                        <small class="text-muted">Complete los datos obligatorios marcados con *</small>
+                    </div>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label class="form-label">* Nombre</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="lbl_nombre"
+                                   placeholder="Nombre completo">
+                        </div>
+
+                        <!-- Nacional / Extranjero -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label mb-1">Nacional</label>
+                                <div class="input-group">
+                                    <div class="input-group-text">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="options"
+                                               value="nacional"
+                                               checked>
+                                    </div>
+                                    <span class="input-group-text">RUT</span>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="lbl_rut_nacional"
+                                           placeholder="Números, sin dígito verificador">
+                                    <span class="input-group-text" id="lbl_rut_nacional_dv">
+                                        N.A.
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label mb-1">Extranjero</label>
+                                <div class="input-group">
+                                    <div class="input-group-text">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="options"
+                                               value="extranjero">
+                                    </div>
+                                    <span class="input-group-text">Pasaporte</span>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="lbl_pass_extranjero"
+                                           placeholder="Alfanumérico">
+                                </div>
+                            </div>
+                            <!-- Nacionalidad -->
+                            <div class="mb-3">
+                                <label class="form-label">* Nacionalidad</label>
+                                <select class="form-select"
+                                        id="lbl_nacionalidad">
+                                    <option value="" selected disabled>Cargando nacionalidades...</option>
+                                </select>
+                            </div>
+
+
+                        </div>
+
+                        <!-- Empresa -->
+                        <div class="mb-3">
+                            <label class="form-label">* Empresa</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="lbl_empresa"
+                                   placeholder="Nombre de la empresa">
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="lbl_email"
+                                   placeholder="correo@empresa.cl">
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="mb-3">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-control"
+                                      id="lbl_observaciones"
+                                      rows="3"
+                                      placeholder="Notas adicionales, comentarios, etc."></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btn_save_personal">
+                        Guardar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Editar Personal -->
+    <div class="modal fade" id="modal_edit_personal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Personal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+
+                        <input type="hidden" id="edit_id">
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" id="edit_nombre" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Empresa</label>
+                            <input type="text" id="edit_empresa" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="text" id="edit_email" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Observaciones</label>
+                            <textarea id="edit_observaciones" class="form-control"></textarea>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btn_update_personal">Actualizar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ver Personal -->
+    <div class="modal fade" id="modal_view_personal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle del Personal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <strong>Nombre:</strong> <span id="view_nombre"></span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Empresa:</strong> <span id="view_empresa"></span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Email:</strong> <span id="view_email"></span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Observaciones:</strong> <span id="view_observaciones"></span>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Otros scripts / integraciones -->
+    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
+
+</div>
+
+<!-- Variables desde el backend -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket')}]]*/ false;
+    let marcaAsistenciaHabilitado = /*[[${@environment.getProperty('propiedad.ver.marca-asistencia')}]]*/ false;
+    /*]]>*/
+</script>
+
+<!-- Lógica SweetAlert2 + modales para esta vista -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Toast reutilizable
+        const SwalToast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+        });
+
+        // Stubs por si no existen en listaPersonal.js (para que no rompa)
+        if (typeof guardarPersonal !== "function") {
+            window.guardarPersonal = function () {
+                console.log("TODO: implementar guardarPersonal()");
+            };
+        }
+        if (typeof exportarListado !== "function") {
+            window.exportarListado = function () {
+                console.log("TODO: implementar exportarListado()");
+            };
+        }
+        if (typeof generarPlantillaQR !== "function") {
+            window.generarPlantillaQR = function () {
+                console.log("TODO: implementar generarPlantillaQR()");
+            };
+        }
+        if (typeof actualizarPersonal !== "function") {
+            window.actualizarPersonal = function () {
+                console.log("TODO: implementar actualizarPersonal()");
+            };
+        }
+        if (typeof obtenerPersonalPorId !== "function") {
+            // función genérica que deberías reemplazar por tu AJAX real
+            window.obtenerPersonalPorId = function (id, callback) {
+                console.log("TODO: implementar obtenerPersonalPorId(id). ID:", id);
+                const dataFake = {
+                    id: id,
+                    nombre: "Nombre de prueba",
+                    empresa: "Empresa de prueba",
+                    email: "correo@empresa.cl",
+                    observaciones: "Observaciones de prueba"
+                };
+                callback(dataFake);
+            };
+        }
+
+        // Guardar personal (botón del modal Registrar)
+        const btnSave = document.getElementById("btn_save_personal");
+        if (btnSave) {
+            btnSave.addEventListener("click", function () {
+
+                Swal.fire({
+                    title: "¿Guardar registro?",
+                    text: "Confirma que los datos ingresados son correctos.",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, guardar",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#0d6efd",
+                    cancelButtonColor: "#6c757d"
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        guardarPersonal();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Guardado correctamente",
+                            text: "El personal ha sido registrado.",
+                            confirmButtonColor: "#0d6efd"
+                        });
+
+                        const modalEl = document.getElementById("modal_new_personal");
+                        if (modalEl) {
+                            const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                            modalInstance.hide();
+                        }
+                    }
+                });
+            });
+        }
+
+        // Exportar listado
+        const btnExport = document.getElementById("btn_export_list");
+        if (btnExport) {
+            btnExport.addEventListener("click", function () {
+
+                SwalToast.fire({
+                    icon: "info",
+                    title: "Generando archivo..."
+                });
+
+                exportarListado();
+            });
+        }
+
+        // Generar plantilla QR
+        const btnQR = document.getElementById("btn_plantilla_qr");
+        if (btnQR) {
+            btnQR.addEventListener("click", function () {
+
+                Swal.fire({
+                    title: "Generar plantilla QR",
+                    text: "Esto creará un documento con los QR del personal.",
+                    icon: "info",
+                    showCancelButton: true,
+                    confirmButtonText: "Generar",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#198754",
+                    cancelButtonColor: "#6c757d"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        generarPlantillaQR();
+                        SwalToast.fire({
+                            icon: "success",
+                            title: "Plantilla QR generada"
+                        });
+                    }
+                });
+
+            });
+        }
+
+        // Delegación de eventos para botones Editar / Ver generados en la tabla
+        document.addEventListener("click", function (e) {
+            const editBtn = e.target.closest(".btn-edit");
+            const viewBtn = e.target.closest(".btn-view");
+
+            // EDITAR
+            if (editBtn) {
+                e.preventDefault(); // evita redirección de <a href="...">
+
+                const id = editBtn.getAttribute("data-id");
+                if (!id) return;
+
+                obtenerPersonalPorId(id, function (data) {
+                    document.getElementById("edit_id").value = data.id || id;
+                    document.getElementById("edit_nombre").value = data.nombre || "";
+                    document.getElementById("edit_empresa").value = data.empresa || "";
+                    document.getElementById("edit_email").value = data.email || "";
+                    document.getElementById("edit_observaciones").value = data.observaciones || "";
+
+                    const modalEl = document.getElementById("modal_edit_personal");
+                    const modalInstance = new bootstrap.Modal(modalEl);
+                    modalInstance.show();
+                });
+            }
+
+            // VER
+            if (viewBtn) {
+                e.preventDefault(); // evita redirección
+
+                const id = viewBtn.getAttribute("data-id");
+                if (!id) return;
+
+                obtenerPersonalPorId(id, function (data) {
+                    document.getElementById("view_nombre").textContent = data.nombre || "";
+                    document.getElementById("view_empresa").textContent = data.empresa || "";
+                    document.getElementById("view_email").textContent = data.email || "";
+                    document.getElementById("view_observaciones").textContent = data.observaciones || "";
+
+                    const modalEl = document.getElementById("modal_view_personal");
+                    const modalInstance = new bootstrap.Modal(modalEl);
+                    modalInstance.show();
+                });
+            }
+        });
+
+        // Botón Actualizar en modal Editar
+        const btnUpdate = document.getElementById("btn_update_personal");
+        if (btnUpdate) {
+            btnUpdate.addEventListener("click", function () {
+
+                Swal.fire({
+                    title: "¿Actualizar registro?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Actualizar",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#0d6efd",
+                    cancelButtonColor: "#6c757d"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        actualizarPersonal();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Actualizado",
+                            text: "Los datos han sido actualizados.",
+                            confirmButtonColor: "#0d6efd"
+                        });
+
+                        const modalEl = document.getElementById("modal_edit_personal");
+                        if (modalEl) {
+                            const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                            modalInstance.hide();
+                        }
+                    }
+                });
+
+            });
+        }
+
+    });
+</script>
+
 </body>
-
 </html>
+
+

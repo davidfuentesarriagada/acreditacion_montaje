@@ -18,6 +18,7 @@ public class PersonalDTO {
 	private boolean extranjero = false;// segun rut
 	private String codigo; // requerido cuando se importa desde la nube
 	private String observaciones;
+	private String nacionalidad;
 	
 	public void setNombre(String nombre) {
 		this.nombre = UtilString.textoDesdeVista(nombre);
