@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import com.sicep.exponor2023.acreditacion_montaje.dao.UsuarioRepository;
 import com.sicep.exponor2023.acreditacion_montaje.domain.usuario.EnumRole;
 import com.sicep.exponor2023.acreditacion_montaje.domain.usuario.Usuario;
-import com.sicep.exponor2023.acreditacion_montaje.resources.email.service.ColaSendEmailService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +55,7 @@ public class DataLoader implements ApplicationRunner {
 			usuario.setEmail("dfuentes@sicep.cl");
 			usuario.setNombre("David Fuentes");
 			usuario.setRole(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_DEVELOPER.name());
 			usuario.getListaPrivilegio().add(EnumRole.ROLE_ADMIN.name());
 			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
 			usuario.setPassword(passwordEncoder.encode("789789"));
@@ -86,6 +86,7 @@ public class DataLoader implements ApplicationRunner {
 			usuario.setEmail("mtrigo@sicep.cl");
 			usuario.setNombre("Manuel Trigo");
 			usuario.setRole(EnumRole.ROLE_ADMIN.name());
+			usuario.getListaPrivilegio().add(EnumRole.ROLE_DEVELOPER.name());
 			usuario.getListaPrivilegio().add(EnumRole.ROLE_ADMIN.name());
 			usuario.getListaPrivilegio().add(EnumRole.ROLE_USER.name());
 			usuario.setPassword(passwordEncoder.encode("789789"));
