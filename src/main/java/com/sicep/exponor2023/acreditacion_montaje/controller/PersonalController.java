@@ -210,4 +210,13 @@ public class PersonalController {
 		}
 	}
 
+	@GetMapping("/personal/check/{rut}")
+	public ResponseEntity<Object> verificarRutExistente(@PathVariable String rut, Principal principal) {
+		try {
+			return new ResponseEntity<>(personalService.verificarRutExistente(rut), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
 }

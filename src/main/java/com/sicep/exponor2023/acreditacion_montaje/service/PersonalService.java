@@ -391,5 +391,9 @@ public class PersonalService {
 			qrGeneratorService.generatePlantilla(personal);
 		}
 	}
+
+	public boolean verificarRutExistente(String rut) {
+		return personalRepository.existsByRutIgnoreCase(rut);
+	}
 	
 }
