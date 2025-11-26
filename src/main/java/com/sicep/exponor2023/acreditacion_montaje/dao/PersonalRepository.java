@@ -11,6 +11,7 @@ import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Expositor;
 import com.sicep.exponor2023.acreditacion_montaje.domain.personal.FilterListaPersonal;
 import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Personal;
 import com.sicep.exponor2023.acreditacion_montaje.domain.personal.PersonalListaExcelDTO;
+import org.springframework.data.repository.query.Param;
 
 public interface PersonalRepository extends JpaRepository<Personal, Long> {
 	Personal findByCodigoIgnoreCase(String codigo);
@@ -71,6 +72,6 @@ public interface PersonalRepository extends JpaRepository<Personal, Long> {
 		"order by personal.nombre asc "
 	)
 	List<PersonalListaExcelDTO> findAllForExcel();
-	
 
+	boolean existsByRutIgnoreCase(String rut);
 }
