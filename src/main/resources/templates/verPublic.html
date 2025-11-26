@@ -104,12 +104,19 @@
             th:text="${personal.nacionalidad} ?: 'No registrada'">
         </dd>
 
-        <!-- ✅ Empresa -->
-        <dt class="col-4">Empresa</dt>
-        <dl class="row" th:each="expositor : ${personal.listaExpositor}">
-            <dt class="col-sm-3"></dt>
-            <dd class="col-sm-9" th:text="${expositor.nombre}"></dd>
-        </dl>
+        <!-- Empresa (primer expositor si existe) -->
+	    <dt class="col-4">Empresa</dt>
+	    <dd class="col-8">
+	        <!-- Si hay expositores, mostramos el nombre del primero -->
+	        <span th:if="${!#lists.isEmpty(personal.listaExpositor)}"
+	              th:text="${personal.listaExpositor[0].nombre}">Empresa</span>
+	
+	        <!-- Si NO hay expositores, mostramos texto por defecto -->
+	        <span th:if="${#lists.isEmpty(personal.listaExpositor)}">
+	            No registrada
+	        </span>
+	    </dd>
+
 
     </dl>
 

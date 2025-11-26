@@ -14,6 +14,11 @@ $(document).ready(function () {
     $("#lbl_rut_nacional").on("change", function(e) {
         $(this).trigger("keyup");
     });
+	
+	// 🔹 NUEVO: cada vez que cambie entre Rut / Pasaporte
+    $('input[name="options"]').on('change', function () {
+        actualizarEstadoNacionalidad();
+    });
 
 });
 
@@ -45,22 +50,19 @@ function initModal() {
         $(this).find(".btn-primary").attr("disabled", false);
         $(this).find("form input[name='options']:first").prop('checked', true);
 
-        // Reset select nacionalidad
-        const selectNacionalidad = document.getElementById("lbl_nacionalidad");
-        if (selectNacionalidad) {
-            // Si no se ha cargado aún, la cargamos
-            if (selectNacionalidad.options.length <= 1) {
-                cargarNacionalidades();
-            } else {
-                selectNacionalidad.value = "";
-            }
-        }
+        // Reset nacionalidad
+        $("#lbl_nacionalidad").val("");
+
+        // 🔹 Muy importante: dejar visible/oculto según la opción actual (por defecto "nacional")
+        actualizarEstadoNacionalidad();
     });
+
     // focus en el primer input
     $('#modal_new_personal').on('shown.bs.modal', function() {
         $(this).find("form input")[0].focus();
     });
 }
+
 
 
 function register() {
@@ -281,6 +283,7 @@ function doPrint(codigo) {
 }
 
 
+// 🔹 Carga de nacionalidades desde API
 function cargarNacionalidades() {
     const selectNacionalidad = document.getElementById("lbl_nacionalidad");
     if (!selectNacionalidad) return;
@@ -322,7 +325,6 @@ function cargarNacionalidades() {
             // Fallback básico si falla la API
             selectNacionalidad.innerHTML = `
 				<option value="" selected disabled>No se pudieron cargar, seleccione manualmente</option>
-				
 				<option value="Argentina">Argentina</option>
 				<option value="Peruana">Peruana</option>
 				<option value="Boliviana">Boliviana</option>
@@ -331,4 +333,24 @@ function cargarNacionalidades() {
 				<option value="Otra">Otra</option>
 			`;
         });
+}
+
+// 🔹 Mostrar / ocultar el bloque de nacionalidad según radio
+function actualizarEstadoNacionalidad() {
+    const opcion = $('input[name="options"]:checked').val();
+    const grupo = $("#grupo_nacionalidad");
+    if (!grupo.length) return;
+
+    if (opcion === "extranjero") {
+        grupo.show();
+
+        // Cargar solo si aún no hay opciones reales
+        const select = document.getElementById("lbl_nacionalidad");
+        if (select && select.options.length <= 1) {
+            cargarNacionalidades();
+        }
+    } else {
+        grupo.hide();
+        $("#lbl_nacionalidad").val("");
+    }
 }
