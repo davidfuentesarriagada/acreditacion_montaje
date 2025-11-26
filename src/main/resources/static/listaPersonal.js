@@ -19,6 +19,12 @@ $(document).ready(function () {
     $('input[name="options"]').on('change', function () {
         actualizarEstadoNacionalidad();
     });
+	// ✅ 👉 AGREGA ESTO AQUÍ
+    $("#lbl_rut_nacional").on("input", function () {
+        this.value = this.value
+            .replace(/[^0-9]/g, "")   // solo números
+            .slice(0, 8);            // máximo 8 dígitos
+    });
 
 });
 
@@ -66,49 +72,103 @@ function initModal() {
 
 
 function register() {
-    // generando el json request
-    let rut;
-    let extranjero = true;
-    let opcion = $('input[name="options"]:checked').val();
-    if (opcion === "nacional") {
-        extranjero = false;
-        rut = $("#lbl_rut_nacional").val();
-    }
-    else
-        rut = $("#lbl_pass_extranjero").val();
 
+    $("#modal_new_personal .is-invalid").removeClass("is-invalid");
+
+    const opcion = $('input[name="options"]:checked').val();
+    let rut;
+    let extranjero = (opcion === "extranjero");
+
+    // ✅ VALIDAR NOMBRE
+    let nombre = $("#lbl_nombre").val()?.trim();
+    if (!nombre) {
+        $("#lbl_nombre").addClass("is-invalid");
+        showError("El nombre es obligatorio.");
+        habilitarBotonGuardar();
+        return;
+    }
+
+    // ✅ VALIDAR SEGÚN TIPO DE DOCUMENTO
+    if (!extranjero) {
+        rut = $("#lbl_rut_nacional").val()?.trim();
+
+        if (!rut) {
+            $("#lbl_rut_nacional").addClass("is-invalid");
+            showError("Debe ingresar el RUT.");
+            habilitarBotonGuardar();
+            return;
+        }
+
+        if (!/^[0-9]{8}$/.test(rut)) {
+            $("#lbl_rut_nacional").addClass("is-invalid");
+            showError("El RUT debe tener exactamente 8 dígitos numéricos.");
+            habilitarBotonGuardar();
+            return;
+        }
+
+    } else {
+        rut = $("#lbl_pass_extranjero").val()?.trim();
+
+        if (!rut) {
+            $("#lbl_pass_extranjero").addClass("is-invalid");
+            showError("Debe ingresar el pasaporte.");
+            habilitarBotonGuardar();
+            return;
+        }
+
+        // ✅ nacionalidad obligatoria solo extranjero
+        if (!$("#lbl_nacionalidad").val()) {
+            $("#lbl_nacionalidad").addClass("is-invalid");
+            showError("Debe seleccionar la nacionalidad.");
+            habilitarBotonGuardar();
+            return;
+        }
+    }
+
+    // ✅ VALIDAR EMPRESA
+    let empresa = $("#lbl_empresa").val()?.trim();
+    if (!empresa) {
+        $("#lbl_empresa").addClass("is-invalid");
+        showError("El campo empresa es obligatorio.");
+        habilitarBotonGuardar();
+        return;
+    }
+
+    // ✅ construir objeto
     let newElem = {
-        nombre : $("#lbl_nombre").val(),
-        rut : rut,
-        empresa : $("#lbl_empresa").val(),
-        email : $("#lbl_email").val(),
+        nombre: nombre,
+        rut: rut,
+        empresa: empresa,
+        email: $("#lbl_email").val(),
         extranjero: extranjero,
-        // 🔹 NUEVO:
         nacionalidad: $("#lbl_nacionalidad").val(),
         observaciones: $("#lbl_observaciones").val()
     };
 
-    // realizando el request
     cargando();
+
     $.ajax({
         url: `${contextpath}PersonalController/personal/register`,
         method: "POST",
         data: JSON.stringify(newElem),
         contentType: "application/json; charset=utf-8",
     })
-        .done(function() {
-            tabla.ajax.reload();// recarga la tabla
-            $("#modal_new_personal").modal("hide");
-            showToast("Se ha realizado el registro");
-        })
-        .fail(function(error) {
-            showError(error.responseText);
-            $("#modal_new_personal .btn-primary").attr("disabled", false);
-        })
-        .always(() => cargaFinalizada())
-    ;
-
+    .done(() => {
+        tabla.ajax.reload();
+        $("#modal_new_personal").modal("hide");
+        showToast("Se ha registrado correctamente.");
+    })
+    .fail(error => {
+        showError(error.responseText);
+        habilitarBotonGuardar();
+    })
+    .always(() => cargaFinalizada());
 }
+
+function habilitarBotonGuardar() {
+    $("#modal_new_personal .btn-primary").attr("disabled", false);
+}
+
 
 function calculoDv() {
     let numero = $("#lbl_rut_nacional").val();
