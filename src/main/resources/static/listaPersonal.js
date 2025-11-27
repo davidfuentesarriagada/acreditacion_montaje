@@ -29,10 +29,11 @@ $(document).ready(function () {
 });
 
 function initButtons() {
+    // Botón guardar del modal
     $("#modal_new_personal .btn-primary").click(function() {
-        $(this).attr("disabled", true);
-        register();
+        register();   // Solo dispara la función, sin deshabilitar aquí
     });
+
     $("#btn_export_list").on('click', function() {
         window.open(`${contextpath}PersonalController/personal/lista/exportar`, '_self');
     });
@@ -46,8 +47,8 @@ function initButtons() {
             .fail(error => showError(error.responseText))
             .always(() => cargaFinalizada());
     });
-
 }
+
 
 function initModal() {
     // vaciado del formulario y habilitacion del boton de registro
@@ -68,6 +69,8 @@ function initModal() {
         $(this).find("form input")[0].focus();
     });
 }
+
+
 
 
 
@@ -134,7 +137,7 @@ function register() {
         return;
     }
 
-    // ✅ construir objeto
+    // ✅ construir objeto (datos válidos)
     let newElem = {
         nombre: nombre,
         rut: rut,
@@ -145,29 +148,96 @@ function register() {
         observaciones: $("#lbl_observaciones").val()
     };
 
-    cargando();
+    // 🟦 CASO EXTRANJERO → sin verificación de RUT, solo confirmación + POST
+    if (extranjero) {
+        showConfirm(
+            "¿Guardar registro?",
+            "Confirma que los datos ingresados son correctos.",
+            function () {
+                $("#modal_new_personal .btn-primary").attr("disabled", true);
+                cargando();
 
-    $.ajax({
-        url: `${contextpath}PersonalController/personal/register`,
-        method: "POST",
-        data: JSON.stringify(newElem),
-        contentType: "application/json; charset=utf-8",
-    })
-    .done(() => {
-        tabla.ajax.reload();
-        $("#modal_new_personal").modal("hide");
-        showToast("Se ha registrado correctamente.");
-    })
-    .fail(error => {
-        showError(error.responseText);
-        habilitarBotonGuardar();
-    })
-    .always(() => cargaFinalizada());
+                $.ajax({
+                    url: `${contextpath}PersonalController/personal/register`,
+                    method: "POST",
+                    data: JSON.stringify(newElem),
+                    contentType: "application/json; charset=utf-8",
+                })
+                .done(() => {
+                    tabla.ajax.reload();
+                    $("#modal_new_personal").modal("hide");
+                    showToast("Se ha registrado correctamente.");
+                })
+                .fail(error => {
+                    showError(error.responseText);
+                })
+                .always(() => {
+                    cargaFinalizada();
+                    habilitarBotonGuardar();
+                });
+            }
+        );
+        return; // 👈 importante: no seguir al flujo de RUT
+    }
+
+    // 🟥 CASO NACIONAL → primero verificar si el RUT ya existe
+    cargando();
+    $.get(`${contextpath}PersonalController/personal/check/${rut}`)
+        .done(function (existe) {
+            cargaFinalizada();
+
+            // Puede venir como boolean, string, número, etc.
+            const yaExiste =
+                existe === true ||
+                existe === "true" ||
+                existe === 1 ||
+                existe === "1";
+
+            if (yaExiste) {
+                showError("El RUT ingresado ya se encuentra registrado en el sistema.");
+                return; // ❌ no se guarda
+            }
+
+            // ✅ RUT NO existe → ahora sí pedimos confirmación y guardamos
+            showConfirm(
+                "¿Guardar registro?",
+                "Confirma que los datos ingresados son correctos.",
+                function () {
+                    $("#modal_new_personal .btn-primary").attr("disabled", true);
+                    cargando();
+
+                    $.ajax({
+                        url: `${contextpath}PersonalController/personal/register`,
+                        method: "POST",
+                        data: JSON.stringify(newElem),
+                        contentType: "application/json; charset=utf-8",
+                    })
+                    .done(() => {
+                        tabla.ajax.reload();
+                        $("#modal_new_personal").modal("hide");
+                        showToast("Se ha registrado correctamente.");
+                    })
+                    .fail(error => {
+                        showError(error.responseText);
+                    })
+                    .always(() => {
+                        cargaFinalizada();
+                        habilitarBotonGuardar();
+                    });
+                }
+            );
+        })
+        .fail(function () {
+            cargaFinalizada();
+            showError("No se pudo verificar el RUT. Intente nuevamente.");
+        });
 }
+
 
 function habilitarBotonGuardar() {
     $("#modal_new_personal .btn-primary").attr("disabled", false);
 }
+
 
 
 function calculoDv() {
@@ -413,4 +483,46 @@ function actualizarEstadoNacionalidad() {
         grupo.hide();
         $("#lbl_nacionalidad").val("");
     }
+}
+
+
+// ✅ ERROR elegante
+function showError(msg) {
+    Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg,
+        confirmButtonColor: "#d33"
+    });
+}
+
+// ✅ ÉXITO estilo moderno
+function showToast(msg) {
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: msg,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    });
+}
+
+// ✅ Confirmación reutilizable
+function showConfirm(title, text, onConfirm) {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#0d6efd",
+        cancelButtonColor: "#6c757d"
+    }).then(result => {
+        if (result.isConfirmed && typeof onConfirm === "function") {
+            onConfirm();
+        }
+    });
 }

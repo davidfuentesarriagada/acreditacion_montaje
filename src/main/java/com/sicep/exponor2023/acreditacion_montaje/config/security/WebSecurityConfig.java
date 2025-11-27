@@ -39,17 +39,21 @@ public class WebSecurityConfig {
 		http
 		.csrf((csrf) -> csrf.disable())// permite mantener la sesion en el cache
 		.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-			//.anyRequest().permitAll()
-			.requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
-	        .requestMatchers(new AntPathRequestMatcher("/error/**")).permitAll()
-			.requestMatchers(new AntPathRequestMatcher("/login*")).permitAll()
-			.requestMatchers(new AntPathRequestMatcher("/personal/*/ver")).permitAll()// visualizacion de los datos de un participante
-			.requestMatchers(new AntPathRequestMatcher("/personal/ticket/*")).permitAll()// visualizacion de los datos de un participante
-			.requestMatchers(new AntPathRequestMatcher("/personal/plantilla/*")).permitAll()// visualizacion de los datos de un participante
-			// librerias js y css
-			.requestMatchers(new AntPathRequestMatcher("/webjars/**")).permitAll()
-			.anyRequest().authenticated()
- 		)
+		        //.anyRequest().permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/error/**")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/login*")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/personal/*/ver")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/personal/ticket/*")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/personal/plantilla/*")).permitAll()
+		        // librerías js, css e imágenes
+		        .requestMatchers(new AntPathRequestMatcher("/webjars/**")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/css/**")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/js/**")).permitAll()
+		        .requestMatchers(new AntPathRequestMatcher("/images/**")).permitAll()
+		        .anyRequest().authenticated()
+		)
+
 		//.formLogin(Customizer.withDefaults())
 		.formLogin((formLogin) -> formLogin
 			.loginPage("/login")

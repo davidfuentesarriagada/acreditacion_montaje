@@ -15,6 +15,7 @@
 
     <!-- SweetAlert2 (puedes moverlo al fragmento JS si quieres global) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 
     <!-- JS propio de esta vista (carga la tabla, etc.) -->
     <script th:src="@{/listaPersonal.js}"></script>
@@ -22,12 +23,18 @@
     <style>
         /* Fondo general de la página */
         body {
-            margin: 0;
-            min-height: 100vh;
-            background: url('/img/fondo_acreditacion.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: "Segoe UI", system-ui, sans-serif;
-        }
+	        min-height: 100vh;
+	        margin: 0;
+	
+	        /* ✅ Usa Thymeleaf para respetar el context-path */
+	        background: url([[@{/images/Fondos__02.png}]]) no-repeat center center fixed;
+	        background-size: cover;
+	
+	        display: flex;
+	        align-items: center;
+	        justify-content: center;
+	        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	    }
 
         /* Card principal */
         .card-personal {
@@ -438,41 +445,8 @@
             };
         }
 
-        // Guardar personal (botón del modal Registrar)
-        const btnSave = document.getElementById("btn_save_personal");
-        if (btnSave) {
-            btnSave.addEventListener("click", function () {
+        
 
-                Swal.fire({
-                    title: "¿Guardar registro?",
-                    text: "Confirma que los datos ingresados son correctos.",
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonText: "Sí, guardar",
-                    cancelButtonText: "Cancelar",
-                    confirmButtonColor: "#0d6efd",
-                    cancelButtonColor: "#6c757d"
-                }).then((result) => {
-
-                    if (result.isConfirmed) {
-                        guardarPersonal();
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "Guardado correctamente",
-                            text: "El personal ha sido registrado.",
-                            confirmButtonColor: "#0d6efd"
-                        });
-
-                        const modalEl = document.getElementById("modal_new_personal");
-                        if (modalEl) {
-                            const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                            modalInstance.hide();
-                        }
-                    }
-                });
-            });
-        }
 
         // Exportar listado
         const btnExport = document.getElementById("btn_export_list");
