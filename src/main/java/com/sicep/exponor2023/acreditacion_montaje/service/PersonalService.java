@@ -395,5 +395,14 @@ public class PersonalService {
 	public boolean verificarRutExistente(String rut) {
 		return personalRepository.existsByRutIgnoreCase(rut);
 	}
+
+	public boolean removerPersonalExistente(String rut){
+		Personal personal = personalRepository.findByRut(rut);
+		if(personal != null) {
+			personalRepository.delete(personal);
+			return true;
+		}
+		return false;
+	}
 	
 }
