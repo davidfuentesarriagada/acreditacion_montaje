@@ -606,7 +606,7 @@
             }
 
             // 🔁 Llamada al backend con el endpoint correcto
-            fetch(`${contextpath}PersonalController/personal/remover/${codigo}`, {
+            fetch(`${contextpath}PersonalController/personal/remover/${encodeURIComponent(codigo)}`, {
                 method: "POST"
             })
             .then(resp => {
