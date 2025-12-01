@@ -219,4 +219,14 @@ public class PersonalController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+
+	@GetMapping("/personal/remover/{rut}")
+	public ResponseEntity<Object> removerPersonal(@PathVariable String rut, Principal principal) {
+		try {
+			return new ResponseEntity<>(personalService.removerPersonalExistente(rut), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
 }
