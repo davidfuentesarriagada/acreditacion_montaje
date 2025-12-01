@@ -581,14 +581,14 @@
         }
 
     });
- // Delegación de eventos para botón Eliminar
+ 	// Delegación de eventos para botón Eliminar
     document.addEventListener("click", function (e) {
         const btnDelete = e.target.closest(".btn-delete-personal");
         if (!btnDelete) return;
 
         e.preventDefault();
 
-        const codigo = btnDelete.getAttribute("data-personal-codigo"); // ← AQUÍ TOMAS EL RUT/CÓDIGO
+        const codigo = btnDelete.getAttribute("data-personal-codigo");
         if (!codigo) return;
 
         Swal.fire({
@@ -601,37 +601,32 @@
             confirmButtonColor: "#dc3545",
             cancelButtonColor: "#6c757d"
         }).then((result) => {
-            if (!result.isConfirmed) {
-                return;
-            }
+            if (!result.isConfirmed) return;
 
             // 🔁 Llamada al backend con el endpoint correcto
-            fetch(`${contextpath}personal/remover/${encodeURIComponent(codigo)}`, {
+            fetch(`${contextpath}PersonalController/personal/remover/${encodeURIComponent(codigo)}`, {
                 method: "POST"
             })
             .then(resp => {
-                if (resp.ok) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Eliminado",
-                        text: "El registro ha sido eliminado correctamente.",
-                        confirmButtonColor: "#0d6efd"
-                    });
+                if (!resp.ok) {
+                    throw new Error("No se pudo eliminar el registro.");
+                }
 
-                    // ✅ Recargar DataTable (tu variable global se llama "tabla")
-                    if (window.tabla) {
-                        tabla.ajax.reload(null, false);
-                    } else {
-                        console.log("TODO: recargar tabla después de eliminar.");
-                        // location.reload(); // opción de emergencia
-                    }
+                // ✅ SweetAlert de éxito + recargar tabla DESPUÉS
+                return Swal.fire({
+                    icon: "success",
+                    title: "Eliminado",
+                    text: "El registro ha sido eliminado correctamente.",
+                    confirmButtonColor: "#0d6efd"
+                });
+            })
+            .then(() => {
+                // 🔄 Recargar DataTable
+                if (window.tabla && typeof tabla.ajax === "object") {
+                    tabla.ajax.reload(null, false); // recarga sin cambiar de página
                 } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "No se pudo eliminar el registro.",
-                        confirmButtonColor: "#0d6efd"
-                    });
+                    console.log("tabla no está definida, como plan B se podría usar location.reload();");
+                    // location.reload();
                 }
             })
             .catch(err => {
@@ -639,12 +634,13 @@
                 Swal.fire({
                     icon: "error",
                     title: "Error",
-                    text: "Ocurrió un problema al intentar eliminar.",
+                    text: err.message || "Ocurrió un problema al intentar eliminar.",
                     confirmButtonColor: "#0d6efd"
                 });
             });
         });
     });
+
 
 
 </script>

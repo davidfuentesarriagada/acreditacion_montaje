@@ -74,3 +74,66 @@ function doDelete() {
 		.fail(error => showError(error.responseText))
 		.always(() => cargaFinalizada());
 }
+
+// ======================
+//  Helpers SweetAlert2
+// ======================
+
+// ❌ Error
+function showError(msg) {
+    Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg || "Ha ocurrido un error.",
+        confirmButtonColor: "#d33"
+    });
+}
+
+// ✅ Toast de éxito / info
+function showToast(msg) {
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: msg || "Operación realizada correctamente.",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    });
+}
+
+// ✅ Confirmación genérica con callback (ya usada en initPrintTicket y initDelete)
+function showConfirm(title, text, onConfirm) {
+    Swal.fire({
+        title: title || "¿Está seguro?",
+        text: text || "",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#0d6efd",
+        cancelButtonColor: "#6c757d"
+    }).then(result => {
+        if (result.isConfirmed && typeof onConfirm === "function") {
+            onConfirm();
+        }
+    });
+}
+
+// ✅ Mensaje de éxito, opcionalmente con redirección
+//   - showMensaje("Texto")
+//   - showMensaje("Texto", "/listaPersonal")
+function showMensaje(msg, redirectUrl) {
+    Swal.fire({
+        icon: "success",
+        title: "Operación exitosa",
+        text: msg || "La operación se ha realizado correctamente.",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#0d6efd"
+    }).then(result => {
+        if (result.isConfirmed && redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    });
+}
+

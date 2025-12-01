@@ -80,7 +80,7 @@ function register() {
 
     const opcion = $('input[name="options"]:checked').val();
     let rut;
-    let extranjero = (opcion === "extranjero");
+    const extranjero = (opcion === "extranjero");
 
     // ✅ VALIDAR NOMBRE
     let nombre = $("#lbl_nombre").val()?.trim();
@@ -93,6 +93,7 @@ function register() {
 
     // ✅ VALIDAR SEGÚN TIPO DE DOCUMENTO
     if (!extranjero) {
+        // NACIONAL
         rut = $("#lbl_rut_nacional").val()?.trim();
 
         if (!rut) {
@@ -110,6 +111,7 @@ function register() {
         }
 
     } else {
+        // EXTRANJERO
         rut = $("#lbl_pass_extranjero").val()?.trim();
 
         if (!rut) {
@@ -127,10 +129,10 @@ function register() {
             return;
         }
 
-        // 🔹 AQUÍ: agregar el prefijo EXT para extranjeros
-        rut = rut.toUpperCase();               // normalizamos
-        if (!rut.startsWith("EXT")) {          // evitamos duplicar si algún día viene con EXT
-            rut = "EXT" + rut;                 // quedará como EXT1234567
+        // 🔹 Prefijo EXT automático (evita duplicar si ya viene)
+        rut = rut.toUpperCase();
+        if (!rut.startsWith("EXT")) {
+            rut = "EXT" + rut;
         }
     }
 
@@ -146,7 +148,7 @@ function register() {
     // ✅ construir objeto (datos válidos)
     let newElem = {
         nombre: nombre,
-        rut: rut,                         // ← ya viene EXTxxxx si es extranjero
+        rut: rut,                                   // ← nacional o EXTxxxx
         empresa: empresa,
         email: $("#lbl_email").val(),
         extranjero: extranjero,
@@ -154,41 +156,9 @@ function register() {
         observaciones: $("#lbl_observaciones").val()
     };
 
-    // 🟦 CASO EXTRANJERO → sin verificación de RUT, solo confirmación + POST
-    if (extranjero) {
-        showConfirm(
-            "¿Guardar registro?",
-            "Confirma que los datos ingresados son correctos.",
-            function () {
-                $("#modal_new_personal .btn-primary").attr("disabled", true);
-                cargando();
-
-                $.ajax({
-                    url: `${contextpath}PersonalController/personal/register`,
-                    method: "POST",
-                    data: JSON.stringify(newElem),
-                    contentType: "application/json; charset=utf-8",
-                })
-                .done(() => {
-                    tabla.ajax.reload();
-                    $("#modal_new_personal").modal("hide");
-                    showToast("Se ha registrado correctamente.");
-                })
-                .fail(error => {
-                    showError(error.responseText);
-                })
-                .always(() => {
-                    cargaFinalizada();
-                    habilitarBotonGuardar();
-                });
-            }
-        );
-        return; // 👈 importante: no seguir al flujo de RUT
-    }
-
-    // 🟥 CASO NACIONAL → primero verificar si el RUT ya existe
+    // 🟦 1) VERIFICAR EN LA BBDD SI EL RUT/PASAPORTE YA EXISTE
     cargando();
-    $.get(`${contextpath}PersonalController/personal/check/${rut}`)
+    $.get(`${contextpath}PersonalController/personal/check/${encodeURIComponent(rut)}`)
         .done(function (existe) {
             cargaFinalizada();
 
@@ -199,11 +169,12 @@ function register() {
                 existe === "1";
 
             if (yaExiste) {
-                showError("El RUT ingresado ya se encuentra registrado en el sistema.");
+                showError("El documento ingresado ya se encuentra registrado en el sistema.");
+                habilitarBotonGuardar();
                 return; // ❌ no se guarda
             }
 
-            // ✅ RUT NO existe → ahora sí pedimos confirmación y guardamos
+            // 🟢 2) NO EXISTE → PEDIR CONFIRMACIÓN Y GUARDAR
             showConfirm(
                 "¿Guardar registro?",
                 "Confirma que los datos ingresados son correctos.",
@@ -234,9 +205,11 @@ function register() {
         })
         .fail(function () {
             cargaFinalizada();
-            showError("No se pudo verificar el RUT. Intente nuevamente.");
+            showError("No se pudo verificar el documento. Intente nuevamente.");
+            habilitarBotonGuardar();
         });
 }
+
 
 
 

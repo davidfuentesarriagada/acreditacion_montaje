@@ -7,18 +7,19 @@
     <title th:text="${personal.nombre}">Detalle de personal</title>
 
     <!-- CSS / JS globales -->
-    <th:block th:replace="~{fragments/css :: import-css}" />
-    <th:block th:replace="~{fragments/js :: import-js}" />
-
-    <!-- (Opcional) Bootstrap Icons, por si no vienen en el fragmento -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}"/>
-
-    <!-- Estilos y scripts de impresión -->
-    <link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
-    <script th:src="@{/print.min.js}"></script>
-
-    <!-- JS propio de esta vista -->
-    <script th:src="@{/ver.js}"></script>
+	<th:block th:replace="~{fragments/css :: import-css}" />
+	<th:block th:replace="~{fragments/js :: import-js}" />
+	
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
+	<!-- Estilos y scripts de impresión -->
+	<link rel="stylesheet" type="text/css" th:href="@{/print.min.css}"/>
+	<script th:src="@{/print.min.js}"></script>
+	
+	<!-- JS propio de esta vista -->
+	<script th:src="@{/ver.js}"></script>
+    
 
     <style>
         /* Fondo general de la página */
@@ -78,6 +79,12 @@
         dl.row dt {
             font-weight: 600;
         }
+        
+        /* 🔥 Desactiva la cortina gris de TODOS los modales dentro de ver.html */
+		.modal-backdrop.show {
+		    display: none !important;
+		}
+        
     </style>
 </head>
 <body>
