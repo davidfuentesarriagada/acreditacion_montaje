@@ -165,4 +165,12 @@ public class QrGeneratorService {
 		}
 	}
 
+	public void eliminarQr(Personal personal) {
+		String rutaResultado = String.format("%s/qr_%s.png", carpetaQr, personal.getCodigo());
+		File pngPlantilla = new File(rutaResultado);
+		if (pngPlantilla.exists() && !pngPlantilla.delete()) {
+			// error con la eliminacion
+		}
+	}
+
 }

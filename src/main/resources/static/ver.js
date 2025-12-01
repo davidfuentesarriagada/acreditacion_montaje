@@ -67,7 +67,7 @@ function initDelete() {
 
 function doDelete() {
 	cargando();
-	$.post(`${contextpath}PersonalController/personal/${codigo}/delete`)
+	$.post(`${contextpath}PersonalController/personal/remover/${codigo}`)
 		.done(function (data) {
 			showMensaje("Se ha eliminado el registro", `${contextpath}listaPersonal`);
 		})
