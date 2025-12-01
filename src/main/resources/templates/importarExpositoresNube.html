@@ -1,26 +1,205 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cargar planilla de expositores con el personal de montaje exportada desde la nube</title>
+    <title>Cargar planilla de expositores con personal de montaje</title>
+
+    <!-- CSS / JS globales -->
     <th:block th:replace="~{fragments/css :: import-css}" />
     <th:block th:replace="~{fragments/js :: import-js}" />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- JS propio -->
     <script th:src="@{/importarPlanillaExpositores.js}"></script>
+
+    <style>
+        /* Fondo general, mismo estilo que listaPersonal */
+        body {
+		    min-height: 100vh;
+		    margin: 0;
+		    background: url([[@{/images/Fondos__02.png}]]) no-repeat center center fixed;
+		    background-size: cover;
+		
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		}
+
+
+        .card-import {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 1rem;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-top: 0.5rem;
+           
+        }
+
+        .card-import .card-header {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .card-import .title-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(13, 110, 253, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+        }
+
+        .card-import .title-icon i {
+            font-size: 1.25rem;
+        }
+
+        .custom-file-label {
+            font-size: 0.9rem;
+        }
+
+        .helper-text {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        /* Quitar espacio excesivo del menú en esta vista */
+		.navbar,
+		.navbar-expand-lg,
+		.navbar-dark {
+		    margin-bottom: 0 !important;
+		    padding-bottom: 0 !important;
+		}
+        .container {
+		    margin-top: 0 !important;
+		    padding-top: 5px !important;
+		}
+    </style>
 </head>
 <body>
+
 <div class="container">
+
+    <!-- Menú -->
     <th:block th:replace="~{fragments/menu :: import-menu}" />
-    <form action="/import/expositoresFromNube" method="POST" enctype="multipart/form-data" id="form_upload">
-        <div class="form-group row">
-            <label for="myFile" class="col-sm-3 col-form-label col-form-label-sm">Seleccione el archivo excel:</label>
-            <div class="col-sm-2">
-                <input type="file" id="myFile" name="file">
+
+    <div class="card card-import">
+        <div class="card-header bg-transparent py-3">
+            <div class="d-flex align-items-center">
+                <div class="title-icon">
+                    <!-- puedes usar cualquier icono de Bootstrap Icons que ya tengas -->
+                    <i class="bi bi-cloud-arrow-up"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0">
+                        Importar planilla de expositores (nube)
+                    </h5>
+                    <small class="text-muted">
+                        Carga el archivo Excel exportado desde la nube con el personal de montaje.
+                    </small>
+                </div>
             </div>
         </div>
-        <button class="btn btn-primary" id="btn_guardar">Aceptar</button>
-    </form>
-    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
-</div>
-</body>
 
+        <div class="card-body">
+            <form th:action="@{/import/expositoresFromNube}"
+                  method="POST"
+                  enctype="multipart/form-data"
+                  id="form_upload">
+
+                <div class="mb-3">
+                    <label for="myFile" class="form-label">
+                        Seleccione el archivo Excel:
+                    </label>
+
+                    <input class="form-control form-control-sm"
+                           type="file"
+                           id="myFile"
+                           name="file"
+                           accept=".xls,.xlsx">
+
+                    <div class="helper-text mt-1">
+                        Formatos permitidos: <strong>.xls</strong>, <strong>.xlsx</strong>.  
+                        Asegúrese de que corresponde a la planilla exportada desde la nube.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a th:href="@{/}"
+                       class="btn btn-outline-secondary btn-sm">
+                        Cancelar
+                    </a>
+                    <button class="btn btn-primary btn-sm" id="btn_guardar" type="submit">
+                        Aceptar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Otros scripts / integraciones -->
+    <th:block th:replace="~{fragments/forefront :: import-forefront}" />
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("form_upload");
+        const inputFile = document.getElementById("myFile");
+
+        form.addEventListener("submit", function (e) {
+            // Validar que haya archivo
+            if (!inputFile.value) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: "warning",
+                    title: "Archivo requerido",
+                    text: "Debes seleccionar un archivo Excel antes de continuar.",
+                    confirmButtonColor: "#0d6efd"
+                });
+                return;
+            }
+
+            // Validar extensión
+            const allowed = [".xls", ".xlsx"];
+            const fileName = inputFile.value.toLowerCase();
+            const isValid = allowed.some(ext => fileName.endsWith(ext));
+
+            if (!isValid) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: "error",
+                    title: "Formato no válido",
+                    text: "El archivo debe ser .xls o .xlsx.",
+                    confirmButtonColor: "#0d6efd"
+                });
+                return;
+            }
+
+            // Confirmación antes de enviar
+            e.preventDefault();
+            Swal.fire({
+                title: "¿Confirmar importación?",
+                text: "Se procesará la planilla de expositores desde la nube.",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Sí, importar",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#0d6efd",
+                cancelButtonColor: "#6c757d"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+
+        });
+
+    });
+</script>
+
+</body>
 </html>

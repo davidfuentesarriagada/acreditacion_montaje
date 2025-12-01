@@ -230,21 +230,32 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label mb-1">Extranjero</label>
-                                <div class="input-group">
-                                    <div class="input-group-text">
-                                        <input class="form-check-input"
-                                               type="radio"
-                                               name="options"
-                                               value="extranjero">
-                                    </div>
-                                    <span class="input-group-text">Pasaporte</span>
-                                    <input type="text"
-                                           class="form-control"
-                                           id="lbl_pass_extranjero"
-                                           placeholder="Alfanumérico">
-                                </div>
-                            </div>
+							    <label class="form-label mb-1">Extranjero</label>
+							    <div class="input-group">
+							
+							        <!-- 🔹 Radio seleccionado por defecto -->
+							        <div class="input-group-text">
+							            <input class="form-check-input"
+							                   type="radio"
+							                   name="options"
+							                   value="extranjero"
+							                   checked>
+							        </div>
+							
+							        <!-- 🔹 Etiqueta “Pasaporte” -->
+							        <span class="input-group-text">Pasaporte</span>
+							
+							        <!-- 🔹 Prefijo EXT fijo al inicio del campo -->
+							        <span class="input-group-text">EXT</span>
+							
+							        <!-- 🔹 Usuario escribe únicamente el resto -->
+							        <input type="text"
+							               class="form-control"
+							               id="lbl_pass_extranjero"
+							               placeholder="Ingrese número de pasaporte">
+							    </div>
+							</div>
+
                             <!-- Nacionalidad (oculta por defecto) -->
 							<div class="mb-3" id="grupo_nacionalidad" style="display:none;">
 							    <label class="form-label">* Nacionalidad</label>
@@ -570,6 +581,72 @@
         }
 
     });
+ // Delegación de eventos para botón Eliminar
+    document.addEventListener("click", function (e) {
+        const btnDelete = e.target.closest(".btn-delete-personal");
+        if (!btnDelete) return;
+
+        e.preventDefault();
+
+        const codigo = btnDelete.getAttribute("data-personal-codigo"); // ← AQUÍ TOMAS EL RUT/CÓDIGO
+        if (!codigo) return;
+
+        Swal.fire({
+            title: "¿Eliminar registro?",
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d"
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            // 🔁 Llamada al backend con el endpoint correcto
+            fetch(`${contextpath}personal/remover/${encodeURIComponent(codigo)}`, {
+                method: "POST"
+            })
+            .then(resp => {
+                if (resp.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminado",
+                        text: "El registro ha sido eliminado correctamente.",
+                        confirmButtonColor: "#0d6efd"
+                    });
+
+                    // ✅ Recargar DataTable (tu variable global se llama "tabla")
+                    if (window.tabla) {
+                        tabla.ajax.reload(null, false);
+                    } else {
+                        console.log("TODO: recargar tabla después de eliminar.");
+                        // location.reload(); // opción de emergencia
+                    }
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "No se pudo eliminar el registro.",
+                        confirmButtonColor: "#0d6efd"
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("Error al eliminar:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Ocurrió un problema al intentar eliminar.",
+                    confirmButtonColor: "#0d6efd"
+                });
+            });
+        });
+    });
+
+
 </script>
 
 </body>

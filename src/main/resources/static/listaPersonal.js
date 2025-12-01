@@ -126,6 +126,12 @@ function register() {
             habilitarBotonGuardar();
             return;
         }
+
+        // 🔹 AQUÍ: agregar el prefijo EXT para extranjeros
+        rut = rut.toUpperCase();               // normalizamos
+        if (!rut.startsWith("EXT")) {          // evitamos duplicar si algún día viene con EXT
+            rut = "EXT" + rut;                 // quedará como EXT1234567
+        }
     }
 
     // ✅ VALIDAR EMPRESA
@@ -140,7 +146,7 @@ function register() {
     // ✅ construir objeto (datos válidos)
     let newElem = {
         nombre: nombre,
-        rut: rut,
+        rut: rut,                         // ← ya viene EXTxxxx si es extranjero
         empresa: empresa,
         email: $("#lbl_email").val(),
         extranjero: extranjero,
@@ -186,7 +192,6 @@ function register() {
         .done(function (existe) {
             cargaFinalizada();
 
-            // Puede venir como boolean, string, número, etc.
             const yaExiste =
                 existe === true ||
                 existe === "true" ||
@@ -232,6 +237,7 @@ function register() {
             showError("No se pudo verificar el RUT. Intente nuevamente.");
         });
 }
+
 
 
 function habilitarBotonGuardar() {
@@ -368,6 +374,9 @@ function initTable() {
                             accion += `</a>`;
                         }
                     }
+					// 🔴 Nuevo botón Eliminar
+					       accion += `<a class="btn btn-danger btn-sm btn-delete-personal" href="#" data-personal-codigo="${data}">Eliminar</a>`;
+
                     accion += `</div>`;
                     return accion;
                 },
