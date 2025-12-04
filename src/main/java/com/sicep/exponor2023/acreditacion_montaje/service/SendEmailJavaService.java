@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.sicep.exponor2023.acreditacion_montaje.resources.email.EmailBase;
 import com.sicep.exponor2023.acreditacion_montaje.resources.email.service.ResponseEmailService;
 import com.sicep.exponor2023.acreditacion_montaje.resources.email.service.SendEmailService;
-import com.sicep.exponor2023.acreditacion_montaje.resources.ServiceLayerException;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,7 @@ public class SendEmailJavaService implements SendEmailService {
 			// agregando parametros para link de desuscripcion y otros en caso de requerirse
 			responseEmailService.preSend(email);
 			
-			if (true) throw new ServiceLayerException("Prueba local");// TODO quitar
+			//if (true) throw new ServiceLayerException("Prueba local");// TODO quitar
 			
 			// creacion del email en bruto (aun no se envia)
 			MimeMessage mimeMessage = email.getMimeMessage();

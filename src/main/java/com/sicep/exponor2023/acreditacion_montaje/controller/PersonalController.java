@@ -73,7 +73,7 @@ public class PersonalController {
 		}
 	}
 	
-	@PostMapping("/personal/{codigo}/delete")
+	@PostMapping("/personal/remover/{codigo}")
 	public ResponseEntity<Object> deletePersonal(@PathVariable String codigo, Principal principal) {
 		try {
 			Usuario usuario = usuarioService.getUsuarioFromSession(principal);
@@ -220,13 +220,13 @@ public class PersonalController {
 		}
 	}
 
-	@GetMapping("/personal/remover/{rut}")
-	public ResponseEntity<Object> removerPersonal(@PathVariable String rut, Principal principal) {
-		try {
-			return new ResponseEntity<>(personalService.removerPersonalExistente(rut), HttpStatus.OK);
-		}
-		catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
+//	@GetMapping("/personal/remover/{rut}")
+//	public ResponseEntity<Object> removerPersonal(@PathVariable String rut, Principal principal) {
+//		try {
+//			return new ResponseEntity<>(personalService.removerPersonalExistente(rut), HttpStatus.OK);
+//		}
+//		catch (Exception e) {
+//			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//		}
+//	}
 }

@@ -581,14 +581,14 @@
         }
 
     });
- 	// Delegación de eventos para botón Eliminar
+ // Delegación de eventos para botón Eliminar
     document.addEventListener("click", function (e) {
         const btnDelete = e.target.closest(".btn-delete-personal");
         if (!btnDelete) return;
 
         e.preventDefault();
 
-        const codigo = btnDelete.getAttribute("data-personal-codigo");
+        const codigo = btnDelete.getAttribute("data-personal-codigo"); // ← AQUÍ TOMAS EL RUT/CÓDIGO
         if (!codigo) return;
 
         Swal.fire({
@@ -601,32 +601,37 @@
             confirmButtonColor: "#dc3545",
             cancelButtonColor: "#6c757d"
         }).then((result) => {
-            if (!result.isConfirmed) return;
+            if (!result.isConfirmed) {
+                return;
+            }
 
             // 🔁 Llamada al backend con el endpoint correcto
             fetch(`${contextpath}PersonalController/personal/remover/${encodeURIComponent(codigo)}`, {
                 method: "POST"
             })
             .then(resp => {
-                if (!resp.ok) {
-                    throw new Error("No se pudo eliminar el registro.");
-                }
+                if (resp.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminado",
+                        text: "El registro ha sido eliminado correctamente.",
+                        confirmButtonColor: "#0d6efd"
+                    });
 
-                // ✅ SweetAlert de éxito + recargar tabla DESPUÉS
-                return Swal.fire({
-                    icon: "success",
-                    title: "Eliminado",
-                    text: "El registro ha sido eliminado correctamente.",
-                    confirmButtonColor: "#0d6efd"
-                });
-            })
-            .then(() => {
-                // 🔄 Recargar DataTable
-                if (window.tabla && typeof tabla.ajax === "object") {
-                    tabla.ajax.reload(null, false); // recarga sin cambiar de página
+                    // ✅ Recargar DataTable (tu variable global se llama "tabla")
+                    if (window.tabla) {
+                        tabla.ajax.reload(null, false);
+                    } else {
+                        console.log("TODO: recargar tabla después de eliminar.");
+                        // location.reload(); // opción de emergencia
+                    }
                 } else {
-                    console.log("tabla no está definida, como plan B se podría usar location.reload();");
-                    // location.reload();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "No se pudo eliminar el registro.",
+                        confirmButtonColor: "#0d6efd"
+                    });
                 }
             })
             .catch(err => {
@@ -634,13 +639,12 @@
                 Swal.fire({
                     icon: "error",
                     title: "Error",
-                    text: err.message || "Ocurrió un problema al intentar eliminar.",
+                    text: "Ocurrió un problema al intentar eliminar.",
                     confirmButtonColor: "#0d6efd"
                 });
             });
         });
     });
-
 
 
 </script>

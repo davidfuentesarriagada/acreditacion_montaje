@@ -218,11 +218,20 @@ public class PersonalService {
 
 	public void deletePersonal(Usuario usuario, String codigo) throws ServiceLayerException {
 		Personal personal = personalRepService.getPersonalByCodigo(codigo);
+
 		// eliminacion de qr, plantilla y ticket
 		qrGeneratorService.eliminar(personal);
 		ticketGeneratorService.eliminar(personal);
-		
+		qrGeneratorService.eliminarQr(personal);
+
 		personalRepository.delete(personal);
+
+		for(Expositor e : personal.getListaExpositor()){
+			long cantidadPersonal = expositorRepository.countPersonalByExpositorIdNative(e.getId());
+			if(cantidadPersonal == 0){ // elimina la empresa expositora si no tiene personal asociado
+				expositorRepository.delete(e);
+			}
+		}
 	}
 
 	public void importExpositoresFromAcreditacion(MultipartFile uploadedFile, Usuario usuario) throws ServiceLayerException {
@@ -395,14 +404,4 @@ public class PersonalService {
 	public boolean verificarRutExistente(String rut) {
 		return personalRepository.existsByRutIgnoreCase(rut);
 	}
-
-	public boolean removerPersonalExistente(String rut){
-		Personal personal = personalRepository.findByRut(rut);
-		if(personal != null) {
-			personalRepository.delete(personal);
-			return true;
-		}
-		return false;
-	}
-	
 }
