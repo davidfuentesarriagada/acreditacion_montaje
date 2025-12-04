@@ -454,6 +454,10 @@ function actualizarEstadoNacionalidad() {
     if (!grupo.length) return;
 
     if (opcion === "extranjero") {
+        // 👉 Si cambia a PASAPORTE, limpiar RUT y DV
+        $("#lbl_rut_nacional").val("");
+        $("#lbl_rut_nacional_dv").text("N.A.");
+
         grupo.show();
 
         // Cargar solo si aún no hay opciones reales
@@ -461,11 +465,16 @@ function actualizarEstadoNacionalidad() {
         if (select && select.options.length <= 1) {
             cargarNacionalidades();
         }
+
     } else {
-        grupo.hide();
+        // 👉 Si cambia a RUT, limpiar PASAPORTE y nacionalidad
+        $("#lbl_pass_extranjero").val("");
         $("#lbl_nacionalidad").val("");
+
+        grupo.hide();
     }
 }
+
 
 
 // ✅ ERROR elegante

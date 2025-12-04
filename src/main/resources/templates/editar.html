@@ -161,24 +161,34 @@
                                 </div>
 
                                 <!-- Extranjero -->
-                                <div class="col-md-12 col-xl-6 mb-3">
-                                    <label class="form-label mb-1">Extranjero</label>
-                                    <div class="input-group">
-                                        <div class="input-group-text">
-                                            <input class="form-check-input"
-                                                   type="radio"
-                                                   name="options"
-                                                   value="extranjero"
-                                                   th:checked="${personal.extranjero}">
-                                        </div>
-                                        <span class="input-group-text">Pasaporte</span>
-                                        <input type="text"
-                                               class="form-control"
-                                               id="lbl_pass_extranjero"
-                                               placeholder="Alfanumérico"
-                                               th:value="${personal.extranjero ? personal.rut : ''}">
-                                    </div>
-                                </div>
+								<div class="col-md-12 col-xl-6 mb-3">
+								    <label class="form-label mb-1">Extranjero</label>
+								    <div class="input-group">
+								
+								        <!-- Radio extranjero -->
+								        <div class="input-group-text">
+								            <input class="form-check-input"
+								                   type="radio"
+								                   name="options"
+								                   value="extranjero"
+								                   th:checked="${personal.extranjero}">
+								        </div>
+								
+								        <!-- Etiqueta “Pasaporte” -->
+								        <span class="input-group-text">Pasaporte</span>
+								
+								        <!-- Prefijo EXT fijo -->
+								        <span class="input-group-text">EXT</span>
+								
+								        <!-- El input sigue recibiendo TODO el rut desde backend -->
+								        <input type="text"
+								               class="form-control"
+								               id="lbl_pass_extranjero"
+								               placeholder="Alfanumérico"
+								               th:value="${personal.extranjero ? personal.rut : ''}">
+								    </div>
+								</div>
+
                             </div>
 
                             <!-- Observaciones -->
