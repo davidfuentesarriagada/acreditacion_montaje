@@ -39,7 +39,7 @@ public class SchedulerSendEmail {
 	private final TaskScheduler taskScheduler;
 	
 	public void start() {
-		taskNextSend = taskScheduler.schedule(() -> sendNextEmail(), UtilFecha.getFechaMilisegundosDespues(UtilFecha.ahora(), msIntervaloEmail).toInstant());
+		taskNextSend = taskScheduler.schedule(this::sendNextEmail, UtilFecha.getFechaMilisegundosDespues(UtilFecha.ahora(), msIntervaloEmail).toInstant());
 	}
 	
 	public void sendNextEmail() {
@@ -66,7 +66,9 @@ public class SchedulerSendEmail {
 		// envio del email
 		// parametros properties
 		email.setSender(sender);
-		email.setTestEmailTo(testEmailTo);
+		//Habilitar para para envio de prueba
+		//email.setTestEmailTo(testEmailTo);
+		email.setTestEmailTo(new String[] {email.getDestinatariosTo()});
 		boolean ok = sendEmailService.sendEmail(email);
 
 		// eliminacion del email de la cola
@@ -82,7 +84,7 @@ public class SchedulerSendEmail {
 			milisegundosDespues = msIntervaloEmail;
 
 		// programando el siguiente envio
-		taskNextSend = taskScheduler.schedule(() -> sendNextEmail(), UtilFecha.getFechaMilisegundosDespues(UtilFecha.ahora(), milisegundosDespues).toInstant());
+		taskNextSend = taskScheduler.schedule(this::sendNextEmail, UtilFecha.getFechaMilisegundosDespues(UtilFecha.ahora(), milisegundosDespues).toInstant());
 	}
 
 	public void detenerNuevosEnvios() {
