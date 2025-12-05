@@ -1,58 +1,133 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="x-apple-disable-message-reformatting">
-<title></title>
-<style>
-table, td, div, h1, p {
-	font-family: Arial, sans-serif;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>Credenciales de montaje y desmontaje</title>
+    <style>
+        table, td, div, h1, h2, p {
+            font-family: Arial, sans-serif;
+        }
 
-p {
-	line-height: 1.8;
-	text-align: justify;
-	text-justify: inter-word;
-}
-</style>
+        p {
+            line-height: 1.8;
+            text-align: justify;
+            text-justify: inter-word;
+            margin: 0 0 12px 0;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0;">
-	<table role="presentation" style="width: 100%; border-collapse: collapse; border: 0; border-spacing: 0; background: #ffffff;">
-		<tr>
-			<td align="center" style="padding: 0;">
-				<table role="presentation" style="width: 750px; border-collapse: collapse; border: 1px solid #cccccc; border-spacing: 0; text-align: left;">
-					<tr>
-						<td style="padding: 36px 30px 42px 30px;">
-							<table role="presentation" style="width: 100%; border-collapse: collapse; border: 0; border-spacing: 0;">
-								<tr>
-									<td style="padding: 0 0 36px 0; color: #153643;">
-										<p>
-											Estimado expositor <span th:text="${nombreEmpresa}"></span>
-										</p>
-										<p>
-											A continuación se adjunta las credenciales de su personal de montaje y desmontaje.
-										</p>
-										<p>
-											<b>Favor asegurarse que cada trabajador lleve a mano su código QR para permitir su 
-											acreditación en la entrada del recinto.</b>
-										</p>
-										<p th:each="personal : ${listaPersonal}">
-											<img th:src="|cid:${personal.codigo}.jpg|" style="width: 100%" alt="">
-										</p>
-										<p>
-											<b>Favor no responder este e-mail</b>.
-										</p>
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<th:block th:replace="~{email/footer :: footer-contact('karlau.codetia@aia.cl')}" />
-					<th:block th:replace="~{email/footer :: footer-unsubscribe('Montaje y Desmontaje Exponor 2024')}" />
-				</table>
-			</td>
-		</tr>
-	</table>
+<body style="margin: 0; padding: 0; background: #f3f4f6;">
+<table role="presentation" style="width: 100%; border-collapse: collapse; border: 0; border-spacing: 0; background: #f3f4f6;">
+    <tr>
+        <td align="center" style="padding: 24px 8px;">
+            <!-- Contenedor principal -->
+            <table role="presentation"
+                   style="width: 750px; max-width: 750px; border-collapse: collapse; border: 1px solid #e5e7eb; border-spacing: 0; text-align: left; background: #ffffff;">
+
+                <!-- Encabezado con color -->
+                <tr>
+                    <td style="padding: 20px 30px; background: #0f172a; color: #e5e7eb;">
+                        <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; opacity: 0.85;">
+                            Exponor · Montaje y desmontaje
+                        </div>
+                        <h1 style="margin: 8px 0 4px 0; font-size: 22px; line-height: 1.3; color: #f9fafb;">
+                            Credenciales de acceso para personal de montaje
+                        </h1>
+                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5f5; line-height: 1.6; text-align: left;">
+                            Información importante para el ingreso al recinto ferial.
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Cuerpo -->
+                <tr>
+                    <td style="padding: 28px 30px 32px 30px;">
+                        <table role="presentation" style="width: 100%; border-collapse: collapse; border: 0; border-spacing: 0;">
+                            <tr>
+                                <td style="padding: 0; color: #111827; font-size: 14px;">
+
+                                    <!-- Saludo y empresa -->
+                                    <p style="margin-bottom: 10px;">
+                                        Estimado(a) expositor(a),
+                                    </p>
+                                    <p style="margin-bottom: 16px;">
+                                        En representación de&nbsp;
+                                        <strong style="color:#0f172a;" th:text="${nombreEmpresa}">Nombre de la empresa</strong>,
+                                        compartimos a continuación las credenciales del personal de montaje y desmontaje asociado a su stand.
+                                    </p>
+
+                                    <!-- Caja de aviso importante -->
+                                    <div style="
+                                        margin: 12px 0 18px 0;
+                                        padding: 12px 14px;
+                                        border-radius: 8px;
+                                        border: 1px solid #fee2e2;
+                                        background: #fef2f2;
+                                        color: #7f1d1d;
+                                        font-size: 13px;">
+                                        <div class="tag-pill" style="background:#b91c1c; color:#fef2f2;">
+                                            Importante
+                                        </div>
+                                        <p style="margin: 8px 0 4px 0; text-align:left;">
+                                            <strong>Antes del día de montaje</strong>, por favor:
+                                        </p>
+                                        <ul style="margin: 4px 0 0 18px; padding: 0; color:#7f1d1d;">
+                                            <li style="margin-bottom: 4px;">Comparta estas credenciales con cada trabajador autorizado.</li>
+                                            <li style="margin-bottom: 4px;">Asegúrese de que cada persona lleve su <strong>código QR legible</strong> en formato impreso o digital.</li>
+                                            <li style="margin-bottom: 0;">Recuerde que el QR es <strong>obligatorio</strong> para permitir la acreditación en la entrada del recinto.</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Texto principal -->
+                                    <p>
+                                        Cada una de las siguientes credenciales corresponde al personal autorizado para realizar labores de
+                                        montaje y desmontaje. El código QR será escaneado en el acceso para validar la acreditación.
+                                    </p>
+
+                                    <!-- Credenciales (imágenes) -->
+                                    <div style="margin-top: 20px; margin-bottom: 8px;">
+                                        <p style="margin: 0 0 8px 0; font-size: 13px; color:#6b7280; text-align:left;">
+                                            Credenciales del personal:
+                                        </p>
+                                    </div>
+
+                                    <div th:each="personal : ${listaPersonal}"
+                                         style="margin-bottom: 16px; border-radius: 10px; border: 1px solid #e5e7eb; padding: 10px; background:#f9fafb;">
+                                        <p style="margin: 0 0 6px 0; font-size: 13px; color:#374151; font-weight:bold;" th:text="${personal.nombre}">Nombre trabajador</p>
+                                        <img th:src="|cid:${personal.codigo}.jpg|"
+                                             alt="Credencial de acceso"
+                                             style="width: 100%; max-width: 100%; border-radius: 6px; display: block; border: 1px solid #d1d5db;">
+                                    </div>
+
+                                    <!-- Nota de no responder -->
+                                    <p style="margin-top: 20px; font-size: 12px; color: #6b7280;">
+                                        <strong>Favor no responder este e-mail.</strong><br>
+                                        Si requiere realizar cambios o tiene consultas adicionales respecto al personal acreditado,
+                                        comuníquese con su ejecutivo de Exponor por los canales habituales.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Footer existente -->
+                <th:block th:replace="~{email/footer :: footer-contact('karlau.codetia@aia.cl')}" />
+                <th:block th:replace="~{email/footer :: footer-unsubscribe('Montaje y Desmontaje Exponor 2024')}" />
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

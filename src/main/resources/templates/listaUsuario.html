@@ -85,6 +85,16 @@
             background-color: transparent !important;
             pointer-events: none !important;  /* <- clave para que no se pegue */
         }
+        /* Asegura que el dropdown de Select2 se vea por encima del modal */
+		.select2-container--open {
+		    z-index: 2000 !important;
+		}
+		
+		/* Que el combo tome todo el ancho del contenedor */
+		.select2-container {
+		    width: 100% !important;
+		}
+        
     </style>
 </head>
 
@@ -159,90 +169,137 @@
     </div>
 
     <!-- Modal: Nuevo Usuario -->
-    <div class="modal fade"
-         id="modal_new_usuario"
-         tabindex="-1"
-         aria-labelledby="modal-titulo_new_usuario"
-         aria-hidden="true">
-
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-titulo_new_usuario">Nuevo Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form>
-
-                        <div class="mb-3 row">
-                            <label for="lbl_nombre" class="col-sm-3 col-form-label">Nombre</label>
-                            <div class="col-sm-9">
-                                <input type="text"
-                                       id="lbl_nombre"
-                                       class="form-control"
-                                       placeholder="Nombre del usuario">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="lbl_email" class="col-sm-3 col-form-label">Email</label>
-                            <div class="col-sm-9">
-                                <input type="text"
-                                       id="lbl_email"
-                                       class="form-control"
-                                       placeholder="usuario@dominio.cl">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="lbl_password" class="col-sm-3 col-form-label">Contraseña</label>
-                            <div class="col-sm-9">
-                                <input type="password"
-                                       id="lbl_password"
-                                       class="form-control"
-                                       placeholder="Contraseña">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="lbl_password_re" class="col-sm-3 col-form-label">Repetir</label>
-                            <div class="col-sm-9">
-                                <input type="password"
-                                       id="lbl_password_re"
-                                       class="form-control"
-                                       placeholder="Repita la contraseña">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="sel_role" class="col-sm-3 col-form-label">Perfil</label>
-                            <div class="col-sm-9">
-                                <select id="sel_role" class="form-control form-control-sm">
-                                    <option value="-1">-- Seleccione Perfil --</option>
-                                    <option value="ROLE_USER">Usuario</option>
-                                    <option value="ROLE_ADMIN">Administrador</option>
-                                </select>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button"
-                            class="btn btn-primary">
-                        Aceptar
-                    </button>
-                </div>
-
-            </div>
-        </div>
-    </div>
+	<div class="modal fade"
+	     id="modal_new_usuario"
+	     tabindex="-1"
+	     aria-labelledby="modal-titulo_new_usuario"
+	     aria-hidden="true">
+	
+	    <div class="modal-dialog modal-dialog-centered">
+	        <div class="modal-content">
+	
+	            <!-- Header -->
+	            <div class="modal-header">
+	                <div>
+	                    <h5 class="modal-title mb-0" id="modal-titulo_new_usuario">
+	                        Nuevo Usuario
+	                    </h5>
+	                    <small class="text-muted">
+	                        Complete los datos para registrar una nueva cuenta.
+	                    </small>
+	                </div>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	            </div>
+	
+	            <!-- Body -->
+	            <div class="modal-body">
+	                <form id="form_new_usuario" novalidate>
+	
+	                    <!-- Nombre -->
+	                    <div class="mb-3">
+	                        <label for="lbl_nombre" class="form-label">Nombre</label>
+	                        <div class="input-group input-group-sm">
+	                            <span class="input-group-text">
+	                                <i class="bi bi-person"></i>
+	                            </span>
+	                            <input type="text"
+	                                   id="lbl_nombre"
+	                                   class="form-control"
+	                                   placeholder="Nombre del usuario">
+	                            <div class="invalid-feedback">
+	                                El nombre es obligatorio.
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- Email -->
+	                    <div class="mb-3">
+	                        <label for="lbl_email" class="form-label">Email</label>
+	                        <div class="input-group input-group-sm">
+	                            <span class="input-group-text">
+	                                <i class="bi bi-envelope"></i>
+	                            </span>
+	                            <input type="text"
+	                                   id="lbl_email"
+	                                   class="form-control"
+	                                   placeholder="usuario@dominio.cl">
+	                            <div class="invalid-feedback">
+	                                Ingrese un email válido.
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- Password -->
+	                    <div class="mb-3">
+	                        <label for="lbl_password" class="form-label">Contraseña</label>
+	                        <div class="input-group input-group-sm">
+	                            <span class="input-group-text">
+	                                <i class="bi bi-lock"></i>
+	                            </span>
+	                            <input type="password"
+	                                   id="lbl_password"
+	                                   class="form-control"
+	                                   placeholder="Mínimo 6 caracteres">
+	                            <button type="button"
+	                                    class="btn btn-outline-secondary btn-sm"
+	                                    id="btn_toggle_password">
+	                                <i class="bi bi-eye"></i>
+	                            </button>
+	                            <div class="invalid-feedback">
+	                                La contraseña debe tener al menos 6 caracteres.
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- Repetir Password -->
+	                    <div class="mb-3">
+	                        <label for="lbl_password_re" class="form-label">Repetir contraseña</label>
+	                        <div class="input-group input-group-sm">
+	                            <span class="input-group-text">
+	                                <i class="bi bi-lock-fill"></i>
+	                            </span>
+	                            <input type="password"
+	                                   id="lbl_password_re"
+	                                   class="form-control"
+	                                   placeholder="Repita la contraseña">
+	                            <div class="invalid-feedback">
+	                                Las contraseñas no coinciden.
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- Perfil -->
+	                    <div class="mb-1">
+	                        <label for="sel_role" class="form-label">Perfil</label>
+	                        <select id="sel_role" class="form-select form-select-sm">
+	                            <option value="-1">-- Seleccione Perfil --</option>
+	                            <option value="ROLE_USER">Usuario</option>
+	                            <option value="ROLE_ADMIN">Administrador</option>
+	                        </select>
+	                        <div class="invalid-feedback">
+	                            Debe seleccionar un perfil.
+	                        </div>
+	                    </div>
+	
+	                </form>
+	            </div>
+	
+	            <!-- Footer -->
+	            <div class="modal-footer">
+	                <button type="button"
+	                        class="btn btn-secondary"
+	                        data-bs-dismiss="modal">Cancelar</button>
+	                <button type="button"
+	                        class="btn btn-primary"
+	                        id="btn_save_usuario">
+	                    Aceptar
+	                </button>
+	            </div>
+	
+	        </div>
+	    </div>
+	</div>
+    
 
     <!-- Scripts extra -->
     <th:block th:replace="~{fragments/forefront :: import-forefront}" />

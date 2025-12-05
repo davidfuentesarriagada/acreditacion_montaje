@@ -605,12 +605,13 @@
                 return;
             }
 
-            // 🔁 Llamada al backend con el endpoint correcto
+         // 🔁 Llamada al backend con el endpoint correcto
             fetch(`${contextpath}PersonalController/personal/remover/${encodeURIComponent(codigo)}`, {
                 method: "POST"
             })
             .then(resp => {
                 if (resp.ok) {
+
                     Swal.fire({
                         icon: "success",
                         title: "Eliminado",
@@ -618,13 +619,22 @@
                         confirmButtonColor: "#0d6efd"
                     });
 
-                    // ✅ Recargar DataTable (tu variable global se llama "tabla")
-                    if (window.tabla) {
-                        tabla.ajax.reload(null, false);
-                    } else {
-                        console.log("TODO: recargar tabla después de eliminar.");
-                        // location.reload(); // opción de emergencia
+                    // ✅ Eliminar la fila del DataTable sin recargar
+                    try {
+                        const dt = $('#table_personal').DataTable();
+
+                        // Buscar fila donde el dato 'codigo' coincide
+                        const row = dt.row((idx, data) => data.codigo == codigo);
+
+                        if (row.any()) {
+                            row.remove().draw(false);
+                        }
+
+                    } catch (e) {
+                        console.error("Error al actualizar tabla:", e);
+                        // location.reload(); // solo si algo falla
                     }
+
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -643,6 +653,7 @@
                     confirmButtonColor: "#0d6efd"
                 });
             });
+
         });
     });
 
