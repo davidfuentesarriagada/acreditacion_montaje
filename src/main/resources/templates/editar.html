@@ -148,8 +148,18 @@
                                         </div>
                                         <span class="input-group-text">RUT</span>
                                         <input type="text"
+                                               hidden
+                                               id="lbl_rut_nacional_hidden"
+                                               th:value="${personal.rut}">
+                                        <input type="text"
+                                               hidden
+                                               id="lbl_extranjero_hidden"
+                                               th:value="${personal.extranjero}">                                               
+                                        <input type="text"
                                                class="form-control"
                                                id="lbl_rut_nacional"
+                                               maxlength="8"
+                                               inputmode="numeric"
                                                placeholder="números, sin dígito verificador"
                                                th:value="${personal.extranjero ? '' : personal.rut}">
                                         <span class="input-group-text"

@@ -458,6 +458,9 @@ function actualizarEstadoNacionalidad() {
         $("#lbl_rut_nacional").val("");
         $("#lbl_rut_nacional_dv").text("N.A.");
 
+        $('#lbl_rut_nacional').prop('disabled', true);
+        $('#lbl_pass_extranjero').prop('disabled', false);        
+
         grupo.show();
 
         // Cargar solo si aún no hay opciones reales
@@ -467,6 +470,9 @@ function actualizarEstadoNacionalidad() {
         }
 
     } else {
+
+        $('#lbl_rut_nacional').prop('disabled', false);
+        $('#lbl_pass_extranjero').prop('disabled', true);
         // 👉 Si cambia a RUT, limpiar PASAPORTE y nacionalidad
         $("#lbl_pass_extranjero").val("");
         $("#lbl_nacionalidad").val("");

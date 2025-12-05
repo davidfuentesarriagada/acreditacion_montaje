@@ -12,6 +12,13 @@ $(function() {
 	 $('input[name="options"]').on("change", function () {
 	     actualizarEstadoDocumentoEditar();
 	 });
+    $("#lbl_rut_nacional").on("input", function () {
+        this.value = this.value
+            .replace(/[^0-9]/g, "")   // solo números
+            .slice(0, 8);            // máximo 8 dígitos
+    });     
+
+    console.log("editar.js cargado");
 
 	 // 🔹 Ejecutar una vez al cargar, para dejar todo coherente
 	 actualizarEstadoDocumentoEditar();
@@ -134,11 +141,25 @@ function actualizarEstadoDocumentoEditar() {
 
     if (opcion === "extranjero") {
         // Si selecciona Extranjero → limpiar RUT y DV
+        if($("#lbl_extranjero_hidden").val() === "true"){
+            $("#lbl_pass_extranjero").val($("#lbl_rut_nacional_hidden").val().replace("EXT",""));
+        }
+
         $("#lbl_rut_nacional").val("");
         $("#lbl_rut_nacional_dv").text("N.A.");
+
+        $('#lbl_rut_nacional').prop('disabled', true);
+        $('#lbl_pass_extranjero').prop('disabled', false);
     } else {
+
+        if($("#lbl_extranjero_hidden").val() === "false"){
+            $("#lbl_rut_nacional").val($("#lbl_rut_nacional_hidden").val());
+            $("#lbl_rut_nacional_dv").text(calculoDv);
+        }        
         // Si selecciona Nacional → limpiar Pasaporte
         $("#lbl_pass_extranjero").val("");
+        $('#lbl_rut_nacional').prop('disabled', false);
+        $('#lbl_pass_extranjero').prop('disabled', true);
     }
 }
 
