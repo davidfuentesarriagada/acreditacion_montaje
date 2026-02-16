@@ -13,9 +13,12 @@
     <!-- Bootstrap Icons (por si no vienen en el fragmento) -->
     <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}"/>
 
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
     <!-- SweetAlert2 (puedes moverlo al fragmento JS si quieres global) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
 
     <!-- JS propio de esta vista (carga la tabla, etc.) -->
     <script th:src="@{/listaPersonal.js}"></script>
@@ -222,7 +225,7 @@
                                            id="lbl_rut_nacional"
                                            maxlength="8"
                                            inputmode="numeric"
-                                           placeholder="Números, sin dígito verificador">
+                                           placeholder="Sin puntos ni guión">
                                     <span class="input-group-text" id="lbl_rut_nacional_dv">
                                         N.A.
                                     </span>
@@ -252,7 +255,7 @@
 							        <input type="text"
 							               class="form-control"
 							               id="lbl_pass_extranjero"
-							               placeholder="Ingrese número de pasaporte">
+							               placeholder="Nº de pasaporte">
 							    </div>
 							</div>
 
@@ -272,18 +275,21 @@
                         <!-- Empresa -->
                         <div class="mb-3">
                             <label class="form-label">* Empresa</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="lbl_empresa"
-                                   placeholder="Nombre de la empresa">
+                            <select id="lbl_empresa" name="campo">
+                                <option th:each="op : ${opciones}"
+                                        th:value="${op}"
+                                        th:text="${op}">
+                                </option>
+                            </select>
                         </div>
 
                         <!-- Email -->
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
+                            <label class="form-label">* Email</label>
                             <input type="text"
                                    class="form-control"
                                    id="lbl_email"
+                                   disabled
                                    placeholder="correo@empresa.cl">
                         </div>
 

@@ -6,6 +6,7 @@ $(document).ready(function () {
     initButtons();
     initModal();
     initTable();
+    initSelect();
 
     $("#lbl_rut_nacional").on("keyup", function(e) {
         calculoDv();
@@ -27,6 +28,84 @@ $(document).ready(function () {
     });
 
 });
+
+function initSelect() {
+    const select  = document.getElementById("lbl_empresa");
+    if(select.tomselect) {
+        select.tomselect.destroy();
+    }
+    $.get(`${contextpath}PersonalController/expositor/all`)
+        .done(function (data) {
+            const valoresBackend = new Set();
+            const inputSecundario = document.getElementById("lbl_email");
+
+            data.forEach(op => {
+                const option = document.createElement("option");
+                option.value = op.id + '_' + op.email;
+                option.textContent = op.nombre;
+                select.appendChild(option);
+            });
+
+            Array.from(select.options).forEach(opt => {
+                if (opt.value !== "") {
+                    valoresBackend.add(opt.value);
+                }
+            });
+
+            new TomSelect("#lbl_empresa", {
+                create: true,
+                persist: false,
+                allowEmptyOption: true,
+                items: [],
+                placeholder: "Seleccione una opción o escriba el nombre de la empresa...",
+
+                render: {
+                    no_results: function(data, escape) {
+                        return '<div class="no-results">No se encontraron resultados</div>';
+                    },
+                    option_create: function(data, escape) {
+                        if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                            return false;
+                        }
+                        return '<div class="create">Añadir empresa nueva: "<strong>' + escape(data.input) + '</strong>"</div>';
+                    }
+                },
+                create: function(input) {
+                    if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                        return false;
+                    }
+                    // Si no hay resultados, permitir crear
+                    return {
+                        value: input,
+                        text: input
+                    };
+                },
+                onChange: function(value) {
+
+                    if (!value) {
+                        // Si vuelve a "Seleccione..."
+                        inputSecundario.disabled = true;
+                        inputSecundario.value = "";
+                        return;
+                    }
+
+                    const yaRegistrada = valoresBackend.has(value);
+
+                    $("#lbl_email").removeClass("is-invalid");
+
+                    if (!yaRegistrada) {
+                        inputSecundario.disabled = false;
+                        inputSecundario.value = "";
+                    } else {
+                        inputSecundario.disabled = true;
+                        inputSecundario.value = value.split("_")[1];
+                    }
+                }
+            });
+
+        })
+        .fail(error => showError(error.responseText))
+}
 
 function initButtons() {
     // Botón guardar del modal
@@ -137,10 +216,18 @@ function register() {
     }
 
     // ✅ VALIDAR EMPRESA
-    let empresa = $("#lbl_empresa").val()?.trim();
+    let empresa = $("#lbl_empresa option:selected").text()?.trim();
     if (!empresa) {
         $("#lbl_empresa").addClass("is-invalid");
         showError("El campo empresa es obligatorio.");
+        habilitarBotonGuardar();
+        return;
+    }
+
+    let email = $("#lbl_email").val();
+    if (!email) {
+        $("#lbl_email").addClass("is-invalid");
+        showError("El correo es obligatorio.");
         habilitarBotonGuardar();
         return;
     }
@@ -149,8 +236,8 @@ function register() {
     let newElem = {
         nombre: nombre,
         rut: rut,                                   // ← nacional o EXTxxxx
-        empresa: empresa,
-        email: $("#lbl_email").val(),
+        empresa: empresa.toUpperCase(),
+        email: email,
         extranjero: extranjero,
         nacionalidad: $("#lbl_nacionalidad").val(),
         observaciones: $("#lbl_observaciones").val()
@@ -191,6 +278,8 @@ function register() {
                     .done(() => {
                         tabla.ajax.reload();
                         $("#modal_new_personal").modal("hide");
+                        initSelect()
+                        $("#lbl_rut_nacional_dv").text("N.A.");
                         showToast("Se ha registrado correctamente.");
                     })
                     .fail(error => {

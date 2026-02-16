@@ -3,6 +3,7 @@ package com.sicep.exponor2023.acreditacion_montaje.controller;
 import java.io.IOException;
 import java.security.Principal;
 
+import com.sicep.exponor2023.acreditacion_montaje.service.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,6 @@ import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Personal;
 import com.sicep.exponor2023.acreditacion_montaje.domain.personal.PersonalDTO;
 import com.sicep.exponor2023.acreditacion_montaje.domain.usuario.Usuario;
 import com.sicep.exponor2023.acreditacion_montaje.resources.ServiceLayerException;
-import com.sicep.exponor2023.acreditacion_montaje.service.ExcelListadoAsistenciaService;
-import com.sicep.exponor2023.acreditacion_montaje.service.ExcelListadoPersonalService;
-import com.sicep.exponor2023.acreditacion_montaje.service.PersonalService;
-import com.sicep.exponor2023.acreditacion_montaje.service.UsuarioService;
 import com.sicep.exponor2023.acreditacion_montaje.util.ArchivoWorkbook;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,6 +37,7 @@ public class PersonalController {
 	private final PersonalService personalService;
 	private final ExcelListadoPersonalService excelListadoPersonalService;
 	private final ExcelListadoAsistenciaService excelListadoAsistenciaService;
+	private final ExpositorRepService expositorRepService;
 	
 	@PostMapping("personal/filter")
 	public ResponseEntity<Object> filter(@RequestBody FilterListaPersonal filtro) {
@@ -214,6 +212,16 @@ public class PersonalController {
 	public ResponseEntity<Object> verificarRutExistente(@PathVariable String rut, Principal principal) {
 		try {
 			return new ResponseEntity<>(personalService.verificarRutExistente(rut), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/expositor/all")
+	public ResponseEntity<Object> getAllExpositores() {
+		try {
+			return new ResponseEntity<>(expositorRepService.findAll(), HttpStatus.OK);
 		}
 		catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -1,5 +1,6 @@
 package com.sicep.exponor2023.acreditacion_montaje.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -22,5 +23,9 @@ public class ExpositorRepService {
 		if (optional.isPresent())
 			return optional.get();
 		throw new ServiceLayerException("Expositor no existe");
+	}
+
+	public List<Expositor> findAll() {
+		return this.expositorRepository.findAll();
 	}
 }
