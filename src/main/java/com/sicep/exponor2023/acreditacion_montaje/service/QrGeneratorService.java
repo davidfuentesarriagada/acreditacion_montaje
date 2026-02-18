@@ -94,55 +94,80 @@ public class QrGeneratorService {
 	}
 
 	public void generatePlantilla(Personal personal) throws ServiceLayerException {
-		String rutaQR = String.format("%s/qr_%s.png", carpetaQr, personal.getCodigo());
-		String rutaResultado = String.format("%s/plantilla_%s.jpg", carpetaPlantilla, personal.getCodigo());
-		
-		try {
-			// obtencion de las dimensiones del qr basadas en la plantilla
-			BufferedImage imgPlantilla = getBufferedImage();
+	    String rutaQR = String.format("%s/qr_%s.png", carpetaQr, personal.getCodigo());
+	    String rutaResultado = String.format("%s/plantilla_%s.jpg", carpetaPlantilla, personal.getCodigo());
 
-			int heightPlantilla = imgPlantilla.getHeight();
-			int widthPlantilla = imgPlantilla.getWidth();
-			int sideCodeQR = heightPlantilla;
-			if (heightPlantilla > widthPlantilla)
-				sideCodeQR = widthPlantilla;
-			sideCodeQR = (int) (sideCodeQR * 0.49);// ancho y largo del cuadro QR
+	    try {
+	        BufferedImage imgPlantilla = getBufferedImage();
 
-			File pngQr = new File(rutaQR);
-			if (!pngQr.exists()) {
-				generateQRCode(personal);
-				pngQr = new File(rutaQR);
-			}
-			BufferedImage imgQr = ImageIO.read(pngQr);
+	        int heightPlantilla = imgPlantilla.getHeight();
+	        int widthPlantilla = imgPlantilla.getWidth();
 
-			Graphics2D g = imgPlantilla.createGraphics();
-			// agregando la segunda imagen en la plantilla
-			g.drawImage(imgQr, (widthPlantilla - sideCodeQR) / 2, (int) (heightPlantilla * 0.45), null);
-			// agregando el nombre del personal
-			String nombre = personal.getNombre().toUpperCase();
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Arial", Font.BOLD, 24));
-			FontMetrics fm = g.getFontMetrics();
-			int anchoTexto = fm.stringWidth(nombre);
-			
-			g.drawString(nombre, ((widthPlantilla - anchoTexto) / 2), (int) (heightPlantilla * 0.43));
+	        int sideCodeQR = heightPlantilla;
+	        if (heightPlantilla > widthPlantilla)
+	            sideCodeQR = widthPlantilla;
 
-			g.setFont(new Font("Arial", Font.BOLD, 26));
-			fm = g.getFontMetrics();
-			anchoTexto = fm.stringWidth(personal.getCodigo());
-			g.drawString(personal.getCodigo(), ((widthPlantilla - anchoTexto) / 2), (int) (heightPlantilla * 0.93));
+	        sideCodeQR = (int) (sideCodeQR * 0.49);
 
-			g.dispose();
+	        File pngQr = new File(rutaQR);
+	        if (!pngQr.exists()) {
+	            generateQRCode(personal);
+	            pngQr = new File(rutaQR);
+	        }
 
-			// generado el archivo resultado: QR + plantilla
-			File resultado = new File(rutaResultado);
-			ImageIO.write(imgPlantilla, "jpg", resultado);
-		}
-		catch (IOException e) {
-			log.error(e.getMessage(), e);
-			throw new ServiceLayerException("Error en la creación de las imágenes con código QR");
-		}
+	        BufferedImage imgQr = ImageIO.read(pngQr);
+
+	        Graphics2D g = imgPlantilla.createGraphics();
+
+	        // Activar antialias para mejor calidad de texto
+	        g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
+	                           java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+	        // 🧩 Posiciones base
+	        int centerX = widthPlantilla / 2;
+	        int qrY = (int) (heightPlantilla * 0.45);
+	        int nameY = (int) (heightPlantilla * 0.43);
+	        int codeY = (int) (heightPlantilla * 0.93);
+
+	        // 🧩 Dibujar QR centrado
+	        g.drawImage(imgQr, centerX - (sideCodeQR / 2), qrY, null);
+
+	        // 🧩 Dibujar NOMBRE con auto-ajuste
+	        String nombre = personal.getNombre() == null ? "" : personal.getNombre().toUpperCase();
+	        g.setColor(Color.BLACK);
+
+	        // ancho máximo permitido = ancho del cuadro QR con padding
+	        int maxNameWidth = (int) (sideCodeQR * 0.96);
+
+	        drawCenteredFitText(
+	                g,
+	                nombre,
+	                centerX,
+	                nameY,
+	                maxNameWidth,
+	                "Arial",
+	                Font.BOLD,
+	                24,   // tamaño inicial
+	                14    // tamaño mínimo
+	        );
+
+	        // 🧩 Dibujar CÓDIGO (más pequeño y siempre centrado)
+	        g.setFont(new Font("Arial", Font.BOLD, 26));
+	        FontMetrics fm = g.getFontMetrics();
+	        int codeWidth = fm.stringWidth(personal.getCodigo());
+	        g.drawString(personal.getCodigo(), centerX - (codeWidth / 2), codeY);
+
+	        g.dispose();
+
+	        File resultado = new File(rutaResultado);
+	        ImageIO.write(imgPlantilla, "jpg", resultado);
+
+	    } catch (IOException e) {
+	        log.error(e.getMessage(), e);
+	        throw new ServiceLayerException("Error en la creación de las imágenes con código QR");
+	    }
 	}
+
 
 	private File getImage(String texto, String rutaPNGdestino, int altoAncho) throws IOException, WriterException {
 		Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
@@ -172,5 +197,43 @@ public class QrGeneratorService {
 			// error con la eliminacion
 		}
 	}
+	
+	private void drawCenteredFitText(Graphics2D g, String text, int centerX, int baselineY, int maxWidth,
+            String fontName, int fontStyle, int startSize, int minSize) {
+
+		if (text == null) text = "";
+		text = text.trim();
+		
+		int size = startSize;
+		Font font = new Font(fontName, fontStyle, size);
+		g.setFont(font);
+		FontMetrics fm = g.getFontMetrics();
+		
+		// 1) reducir fuente hasta que quepa
+		while (fm.stringWidth(text) > maxWidth && size > minSize) {
+		size--;
+		font = new Font(fontName, fontStyle, size);
+		g.setFont(font);
+		fm = g.getFontMetrics();
+		}
+		
+		// 2) si aun no cabe, cortar y agregar "..."
+		if (fm.stringWidth(text) > maxWidth) {
+		String ell = "...";
+		int ellW = fm.stringWidth(ell);
+		String cut = text;
+		
+		while (cut.length() > 0 && (fm.stringWidth(cut) + ellW) > maxWidth) {
+		cut = cut.substring(0, cut.length() - 1);
+		}
+		text = (cut.isEmpty()) ? "" : (cut + ell);
+		}
+		
+		int textW = fm.stringWidth(text);
+		int x = centerX - (textW / 2);
+		g.drawString(text, x, baselineY);
+		}
+	
+
 
 }
