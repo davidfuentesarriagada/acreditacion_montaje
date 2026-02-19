@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PlantillaEmail {
-	public static final String nombreEvento = "Exponor 2024";
+	public static final String nombreEvento = "Exponor 2026";
 	public static final String emailDesuscripcion = "desuscripciones@sicep.cl";
 	
 	public static void addDesuscripcion(MimeMessage mimeMessage, String modulo) throws MessagingException {
