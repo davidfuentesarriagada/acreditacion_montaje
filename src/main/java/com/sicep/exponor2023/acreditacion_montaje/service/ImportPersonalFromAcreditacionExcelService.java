@@ -152,12 +152,17 @@ public class ImportPersonalFromAcreditacionExcelService {
 					extranjero = false;
 				}
 			}// rut de entrada no nulo
-			
+
+			if(rut == null){
+				log.error("RUT NULO para trabajador {} de empresa {}", nombre, empresa);
+				continue;
+			}
+
 			PersonalDTO dto = new PersonalDTO();
 			dto.setEmail(email);
 			dto.setEmpresa(empresa);
 			dto.setNombre(nombre);
-			dto.setRut(rut);
+			dto.setRut(extranjero ? "EXT".concat(rut) : rut);
 			dto.setExtranjero(extranjero);
 			
 			listaDto.add(dto);
