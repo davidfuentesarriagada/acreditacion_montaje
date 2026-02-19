@@ -39,6 +39,8 @@ public class ViewController {
 	private String carpetaTickets;
 	@Value("#{'${propiedad.carpetaLocal}'.concat('/plantilla')}")
 	private String carpetaPlantilla;
+	@Value("${spring.profiles.active}")
+	private String env;
 	@Value("${propiedad.ver.marca-asistencia}")
 	private boolean marcaAsistencia;
 	@Value("${propiedad.printTicket}")
@@ -59,7 +61,10 @@ public class ViewController {
 	}
 
 	@GetMapping("importarExpositoresAcreditacion")
-	public String go_importarExpositoresAcreditacion() {
+	public String go_importarExpositoresAcreditacion(Model model) {
+		String importUrl = "/import/expositoresFromAcreditacion";
+		if (env.equals("prod")) importUrl = "/acreditacion_montaje".concat(importUrl);
+		model.addAttribute("importUrl", importUrl);
 		return "importarExpositoresAcreditacion";
 	}
 	

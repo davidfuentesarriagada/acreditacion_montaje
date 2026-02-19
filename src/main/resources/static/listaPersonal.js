@@ -345,7 +345,7 @@ function calculoDv() {
 function initTable() {
     var cfgTabla= {
         dom: '<"top"i>frt<"bottom"lp><"clear">',
-        ordering: true,
+        ordering: false,
         paging: true,
         searching: true,// necesario para filtrado
         processing: true,// ajax
@@ -359,7 +359,7 @@ function initTable() {
             },
         },
         columns: [
-            { title:"Nombre", data:"nombre" },
+            { title:"Nombre", data:"nombre", orderable: false },
             {
                 title:"Empresa", data:"listaExpositor", orderable: false,
                 render: function(data, type, row, meta) {
@@ -374,9 +374,9 @@ function initTable() {
                 }
             },
 
-            { title:"Registro", data:"fechaRegistro" },
+            { title:"Registro", data:"fechaRegistro", orderable: false },
             {
-                title:"Rut", data:"rut",
+                title:"Rut", data:"rut", orderable: false,
                 render: (data, type, row) => {
                     if (!row.extranjero)
                         return row.rutCompleto;
@@ -399,9 +399,9 @@ function initTable() {
                 }
             },
             //{ title:"Email", data:"email" },
-            { title:"Código", data:"codigo" },
+            { title:"Código", data:"codigo", orderable: false },
             {
-                title:"Email enviado", data:"fechaEnvioCredenciales",
+                title:"Email enviado", data:"fechaEnvioCredenciales", orderable: false,
                 render: (data, type, row) => {
                     if (data === null)
                         return `<span class="badge text-bg-secondary">NO</span>`;
@@ -410,7 +410,7 @@ function initTable() {
                 }
             },
             {
-                title:"Ticket impreso", data:"fechaImpresionTicket",
+                title:"Ticket impreso", data:"fechaImpresionTicket", orderable: false,
                 render: (data, type, row) => {
                     if (data === null)
                         return `<span class="badge text-bg-secondary">NO</span>`;
@@ -418,7 +418,7 @@ function initTable() {
                 }
             },
             {
-                title:"", data:"codigo",
+                title:"", data:"codigo", orderable: false,
                 render: (data, type, row) => {
                     let accion = `<div class="d-grid gap-2 d-md-flex justify-content-md-end">`
                     accion += `<a class="btn btn-primary btn-sm" href='${contextpath}personal/${data}/editar'>Editar</a>`
@@ -426,7 +426,7 @@ function initTable() {
                     if (imprimeTicketHabilitado == "true") {
                         if (row.fechaImpresionTicket === null) {
                             accion += `<a class="btn btn-info btn-sm" role="button" href="#" data-personal-codigo="${data}">`;
-                            accion += `<svg class="bi" width="12" height="12" fill="currentColor"><use href="${contextpath}webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer"></use></svg>`;
+                            accion += `<use href="${contextpath}webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer"></use>`;
                             accion += `<span data-personal-codigo="${data}">Imprimir</span>`;
                             accion += `</a>`;
                         }
