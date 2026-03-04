@@ -216,12 +216,12 @@ public class TicketGeneratorService {
 		}
 	}
 	
-	public void convertToPdf(Personal personal) throws ServiceLayerException {
+	public File convertToPdf(Personal personal) throws ServiceLayerException {
 		String codigo = personal.getCodigo();
 		File pdfFile = new File(carpetaTickets, String.format("ticket_%s.pdf", codigo));
 		// si el pdf existe, no hacer nada
 		if (pdfFile.exists())
-			return;
+			return pdfFile;
 		
 		// se requiere crear el png primero
 		File imageFile = new File(carpetaTickets, String.format("ticket_%s.png", codigo));
@@ -244,6 +244,7 @@ public class TicketGeneratorService {
 		    document.add(image1);
 		    document.close();
 		    writer.close();
+			return new File(carpetaTickets, String.format("ticket_%s.pdf", codigo));
 		}
 		catch(IOException | DocumentException e) {
 			log.error(e.getMessage());

@@ -1,6 +1,8 @@
 package com.sicep.exponor2023.acreditacion_montaje.service;
 
+import java.awt.print.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.printing.PDFPrintable;
+import org.apache.pdfbox.printing.Scaling;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -312,26 +317,57 @@ public class PersonalService {
 		
 		return printTicket(personal);
 	}
-	
+
 	public Personal printTicket(Personal personal) throws ServiceLayerException {
 		// creando el qr si no existe
 		qrGeneratorService.generateQRCode(personal);
-		
+
 		// convirtiendo el ticket de png a pdf
-		ticketGeneratorService.convertToPdf(personal);
+		File file = ticketGeneratorService.convertToPdf(personal);
+
 		// habilitar
-		RestTemplate restTemplate= new RestTemplate();
+//		RestTemplate restTemplate= new RestTemplate();
+//		try {
+//			restTemplate.getForEntity("http://127.0.0.1:8001/print/"+personal.getCodigo(), String.class);
+//		}
+//		catch(Exception e) {
+//			log.error(e.getMessage(), e);
+//		}
+
 		try {
-			restTemplate.getForEntity("http://127.0.0.1:8001/print/"+personal.getCodigo(), String.class);
+			printFile(file);
+		} catch (Exception e) {
+			log.error("Error al imprimir ticket para personal {}: {}", personal.getCodigo(), e.getMessage(), e);
+			throw new ServiceLayerException("Error al imprimir ticket. Por favor, intente nuevamente.");
 		}
-		catch(Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		
+
 		personal.setImpresionTicketDate(UtilFecha.ahora());
 		personalRepository.save(personal);
-		
+
 		return personal;
+	}
+
+	public void printFile(File pdfFile) throws IOException, PrinterException {
+		PDDocument document = PDDocument.load(pdfFile);
+
+		PrinterJob job = PrinterJob.getPrinterJob();
+
+		// Configurar papel con tamaño personalizado (29mm x 90mm)
+		Paper paper = new Paper();
+		double width = 29 * 72 / 25.4;   // 29 mm -> 82.05 pts
+		double height = 90 * 72 / 25.4; // 90 mm -> 255.12 pts
+		paper.setSize(width, height);
+		paper.setImageableArea(0, 0, width, height);
+
+		PageFormat pageFormat = new PageFormat();
+		pageFormat.setOrientation(PageFormat.LANDSCAPE);
+		pageFormat.setPaper(paper);
+
+		Printable printable = new PDFPrintable(document, Scaling.SCALE_TO_FIT);
+
+		job.setPrintable(printable, pageFormat);
+
+		job.print();
 	}
 	
 	
