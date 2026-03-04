@@ -6,7 +6,8 @@ $(document).ready(function () {
     initButtons();
     initModal();
     initTable();
-    initSelect();
+    initSelect()
+    initSelectModulador();
 
     $("#lbl_rut_nacional").on("keyup", function(e) {
         calculoDv();
@@ -64,16 +65,72 @@ function initSelect() {
                         return '<div class="no-results">No se encontraron resultados</div>';
                     },
                     option_create: function(data, escape) {
-                        if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
-                            return false;
-                        }
-                        return '<div class="create">Añadir empresa nueva: "<strong>' + escape(data.input) + '</strong>"</div>';
+                        // if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                        //     return false;
+                        // }
+                        return '<div class="create active">Añadir empresa nueva: "<strong>' + escape(data.input) + '</strong>"</div>';
                     }
                 },
                 create: function(input) {
-                    if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
-                        return false;
+                    // if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                    //     return false;
+                    // }
+                    return {
+                        value: input,
+                        text: input
+                    };
+                }
+            });
+
+        })
+        .fail(error => showError(error.responseText))
+}
+
+function initSelectModulador() {
+    const select  = document.getElementById("lbl_empresa_moduladora");
+    if(select.tomselect) {
+        select.tomselect.destroy();
+    }
+    $.get(`${contextpath}PersonalController/modulador/all`)
+        .done(function (data) {
+            const valoresBackend = new Set();
+            const inputSecundario = document.getElementById("lbl_email");
+
+            data.forEach(op => {
+                const option = document.createElement("option");
+                option.value = op.id + '_' + op.email;
+                option.textContent = op.nombre;
+                select.appendChild(option);
+            });
+
+            Array.from(select.options).forEach(opt => {
+                if (opt.value !== "") {
+                    valoresBackend.add(opt.value);
+                }
+            });
+
+            new TomSelect("#lbl_empresa_moduladora", {
+                create: true,
+                persist: false,
+                allowEmptyOption: true,
+                items: [],
+                placeholder: "Seleccione una opción o escriba el nombre de la empresa...",
+
+                render: {
+                    no_results: function(data, escape) {
+                        return '<div class="no-results">No se encontraron resultados</div>';
+                    },
+                    option_create: function(data, escape) {
+                        // if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                        //     return false;
+                        // }
+                        return '<div class="create active">Añadir empresa nueva: "<strong>' + escape(data.input) + '</strong>"</div>';
                     }
+                },
+                create: function(input) {
+                    // if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                    //     return false;
+                    // }
                     // Si no hay resultados, permitir crear
                     return {
                         value: input,
@@ -219,7 +276,15 @@ function register() {
     let empresa = $("#lbl_empresa option:selected").text()?.trim();
     if (!empresa) {
         $("#lbl_empresa").addClass("is-invalid");
-        showError("El campo empresa es obligatorio.");
+        showError("El campo empresa expositora es obligatorio.");
+        habilitarBotonGuardar();
+        return;
+    }
+
+    let empresaModuladora = $("#lbl_empresa_moduladora option:selected").text()?.trim();
+    if (!empresaModuladora) {
+        $("#lbl_empresa_moduladora").addClass("is-invalid");
+        showError("El campo empresa moduladora es obligatorio.");
         habilitarBotonGuardar();
         return;
     }
@@ -237,6 +302,7 @@ function register() {
         nombre: nombre,
         rut: rut,                                   // ← nacional o EXTxxxx
         empresa: empresa.toUpperCase(),
+        empresaModuladora: empresaModuladora.toUpperCase(),
         email: email,
         extranjero: extranjero,
         nacionalidad: $("#lbl_nacionalidad").val(),
@@ -279,7 +345,9 @@ function register() {
                         tabla.ajax.reload();
                         $("#modal_new_personal").modal("hide");
                         initSelect()
+                        initSelectModulador();
                         $("#lbl_rut_nacional_dv").text("N.A.");
+                        $("#lbl_observaciones").text("")
                         showToast("Se ha registrado correctamente.");
                     })
                     .fail(error => {
@@ -361,7 +429,7 @@ function initTable() {
         columns: [
             { title:"Nombre", data:"nombre", orderable: false },
             {
-                title:"Empresa", data:"listaExpositor", orderable: false,
+                title:"Empresa Expositora", data:"listaExpositor", orderable: false,
                 render: function(data, type, row, meta) {
                     if (data.length === 1)
                         return data[0].nombre;
@@ -386,13 +454,26 @@ function initTable() {
                 }
             },
             {
-                title:"Email", data:"listaExpositor", orderable: false,
+                title:"Empresa Moduladora", data:"listaModulador", orderable: false,
+                render: function(data, type, row, meta) {
+                    if (data.length === 1)
+                        return data[0].nombre;
+
+                    let listaNombreModulador = data.map(e => e.nombre);// lista de nombre de empresas moduladoras del personal
+                    let textoDespl = listaNombreModulador.join("\n- ");
+
+                    return `${data[0].nombre} 
+					<span title="Moduladores:\n- ${textoDespl}"><i class="bi bi-exclamation-circle"></i></span>`;
+                }
+            },
+            {
+                title:"Email Moduladora", data:"listaModulador", orderable: false,
                 render: function(data, type, row, meta) {
                     if (data.length === 1)
                         return data[0].email;
 
-                    let listaEmailExpositor = data.map(e => `${e.nombre} - ${e.email}`);// lista de email y nombre de expositores del personal
-                    let textoDespl = listaEmailExpositor.join("\n- ");
+                    let listaNombreModulador = data.map(e => `${e.nombre} - ${e.email}`);// lista de email y nombre de expositores del personal
+                    let textoDespl = listaNombreModulador.join("\n- ");
 
                     return `${data[0].email} 
 					<span title="Emails:\n- ${textoDespl}"><i class="bi bi-exclamation-circle"></i></span>`;

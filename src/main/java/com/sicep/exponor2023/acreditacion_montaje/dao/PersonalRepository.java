@@ -2,15 +2,12 @@ package com.sicep.exponor2023.acreditacion_montaje.dao;
 
 import java.util.List;
 
+import com.sicep.exponor2023.acreditacion_montaje.domain.personal.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Expositor;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.FilterListaPersonal;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Personal;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.PersonalListaExcelDTO;
 import org.springframework.data.repository.query.Param;
 
 public interface PersonalRepository extends JpaRepository<Personal, Long> {
@@ -19,13 +16,16 @@ public interface PersonalRepository extends JpaRepository<Personal, Long> {
 	@Query(
 		"select distinct(personal) "+
 		"from Personal personal "+
-		"inner join personal.listaExpositor expositor "+		
+		"inner join personal.listaExpositor expositor "+
+		"inner join personal.listaModulador modulador "+
 		"where ( "+
 			":#{#filtro.searchText == null ? 1 : 0} = 1 "+
 			"or ( "+
 				"upper(personal.nombre) like concat('%',upper(:#{#filtro.searchText}),'%') "+
 				"or upper(expositor.nombre) like concat('%',upper(:#{#filtro.searchText}),'%') "+
 				"or upper(expositor.email) like concat('%',upper(:#{#filtro.searchText}),'%') "+
+				"or upper(modulador.nombre) like concat('%',upper(:#{#filtro.searchText}),'%') "+
+				"or upper(modulador.email) like concat('%',upper(:#{#filtro.searchText}),'%') "+
 				"or upper(personal.rut) like concat('%',upper(:#{#filtro.searchText}),'%') "+
 				"or personal.codigo like concat('%',upper(:#{#filtro.searchText}),'%') "+
 			") "+
@@ -40,6 +40,8 @@ public interface PersonalRepository extends JpaRepository<Personal, Long> {
 	boolean existsByRut(String rut);
 	
 	List<Personal> findByListaExpositor(Expositor expositor);
+
+	List<Personal> findByListaModulador(Modulador modulador);
 
 	@Query(
 		"select "+

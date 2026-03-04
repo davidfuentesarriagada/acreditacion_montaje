@@ -109,7 +109,20 @@
         </dd>
 
         <!-- Empresa (primer expositor si existe) -->
-	    <dt class="col-4">Empresa</dt>
+        <dt class="col-4">Moduladora</dt>
+        <dd class="col-8">
+            <!-- Si hay expositores, mostramos el nombre del primero -->
+            <span th:if="${!#lists.isEmpty(personal.listaModulador)}"
+                  th:text="${personal.listaModulador[0].nombre}">Empresa</span>
+
+            <!-- Si NO hay expositores, mostramos texto por defecto -->
+            <span th:if="${#lists.isEmpty(personal.listaModulador)}">
+	            No registrada
+	        </span>
+        </dd>
+
+        <!-- Empresa (primer expositor si existe) -->
+	    <dt class="col-4">Expositora</dt>
 	    <dd class="col-8">
 	        <!-- Si hay expositores, mostramos el nombre del primero -->
 	        <span th:if="${!#lists.isEmpty(personal.listaExpositor)}"

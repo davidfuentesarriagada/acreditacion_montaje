@@ -51,7 +51,7 @@ public class TicketGeneratorService {
 			// nombre
         	insertaInfoNombre(g, personal.getNombre(), imgTicket.getWidth(), imgTicket.getHeight(), 0);
 			// empresa
-        	String nombreEmpresas = personal.getListaExpositor().stream().map(e -> e.getNombre()).collect(Collectors.joining(", "));
+        	String nombreEmpresas = personal.getListaModulador().stream().map(e -> e.getNombre()).collect(Collectors.joining(", "));
         	
         	insertaInfoEmpresa(g, nombreEmpresas, imgTicket.getWidth(), imgTicket.getHeight(), imgTicket.getHeight() * 1 / 3);
 			// codigo
@@ -216,12 +216,12 @@ public class TicketGeneratorService {
 		}
 	}
 	
-	public void convertToPdf(Personal personal) throws ServiceLayerException {
+	public File convertToPdf(Personal personal) throws ServiceLayerException {
 		String codigo = personal.getCodigo();
 		File pdfFile = new File(carpetaTickets, String.format("ticket_%s.pdf", codigo));
 		// si el pdf existe, no hacer nada
 		if (pdfFile.exists())
-			return;
+			return pdfFile;
 		
 		// se requiere crear el png primero
 		File imageFile = new File(carpetaTickets, String.format("ticket_%s.png", codigo));
@@ -244,6 +244,8 @@ public class TicketGeneratorService {
 		    document.add(image1);
 		    document.close();
 		    writer.close();
+			pdfFile = new File(carpetaTickets, String.format("ticket_%s.pdf", codigo));
+			return pdfFile;
 		}
 		catch(IOException | DocumentException e) {
 			log.error(e.getMessage());

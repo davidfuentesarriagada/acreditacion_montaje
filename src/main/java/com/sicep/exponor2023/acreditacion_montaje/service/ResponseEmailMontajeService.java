@@ -86,7 +86,7 @@ public class ResponseEmailMontajeService extends ResponseEmailService {
 		if (email instanceof EmailAcreditacion) {
 			EmailAcreditacion emailAcreditacion = (EmailAcreditacion) email;
 			emailAcreditacion.setCarpetaQr(carpetaPlantilla);
-			List<Personal> listaPersonal = personalRepository.findByListaExpositor(emailAcreditacion.getExpositor());
+			List<Personal> listaPersonal = personalRepository.findByListaModulador(emailAcreditacion.getModulador());
 			emailAcreditacion.setListaPersonal(listaPersonal);
 		}
 	}

@@ -38,6 +38,7 @@ public class PersonalController {
 	private final ExcelListadoPersonalService excelListadoPersonalService;
 	private final ExcelListadoAsistenciaService excelListadoAsistenciaService;
 	private final ExpositorRepService expositorRepService;
+	private final ModuladorRepService moduladorRepService;
 	
 	@PostMapping("personal/filter")
 	public ResponseEntity<Object> filter(@RequestBody FilterListaPersonal filtro) {
@@ -122,10 +123,10 @@ public class PersonalController {
 		}
 	}
 
-	@PostMapping("/expositor/{idExpositor}/sendEmail")
-	public ResponseEntity<Object> sendEmail(@PathVariable long idExpositor) {
+	@PostMapping("/expositor/{idModulador}/sendEmail")
+	public ResponseEntity<Object> sendEmail(@PathVariable long idModulador) {
 		try {
-			personalService.sendEmailByExpositor(idExpositor);
+			personalService.sendEmailByModulador(idModulador);
 			return new ResponseEntity<>(true, HttpStatus.OK);
 		}
 		catch (ServiceLayerException e) {
@@ -222,6 +223,16 @@ public class PersonalController {
 	public ResponseEntity<Object> getAllExpositores() {
 		try {
 			return new ResponseEntity<>(expositorRepService.findAll(), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/modulador/all")
+	public ResponseEntity<Object> getAllModulador() {
+		try {
+			return new ResponseEntity<>(moduladorRepService.findAll(), HttpStatus.OK);
 		}
 		catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

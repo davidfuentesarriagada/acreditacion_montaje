@@ -2,6 +2,7 @@ package com.sicep.exponor2023.acreditacion_montaje.service;
 
 import java.util.List;
 
+import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Modulador;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +28,17 @@ public class EmailService {
 	private final QrGeneratorService qrGeneratorService;
 	private final PersonalRepository personalRepository;
 
-	public void sendByExpositor(Expositor expositor) throws ServiceLayerException {
-		if (emailErrorService.exists(expositor.getEmail()))
+	public void sendByModulador(Modulador modulador) throws ServiceLayerException {
+		if (emailErrorService.exists(modulador.getEmail()))
 			return;
-		
+
 		// creacion de la plantilla qr en caso de no existir
-		List<Personal> listaPersonal = personalRepository.findByListaExpositor(expositor);
+		List<Personal> listaPersonal = personalRepository.findByListaModulador(modulador);
 		for (Personal personal : listaPersonal)
 			qrGeneratorService.generatePlantilla(personal);
-		
-		// registro del email en la cola bd 
-		EmailAcreditacion email = new EmailAcreditacion(expositor);
+
+		// registro del email en la cola bd
+		EmailAcreditacion email = new EmailAcreditacion(modulador);
 		email.setNumeroPrioridad(emailBaseRepository.previousPrimeraPrioridad());
 		email.setFechaRegistro(UtilFecha.ahora());
 		emailBaseRepository.saveAndFlush(email);

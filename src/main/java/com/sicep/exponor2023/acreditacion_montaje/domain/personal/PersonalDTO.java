@@ -13,6 +13,7 @@ import lombok.Setter;
 public class PersonalDTO {
 	private String nombre;
 	private String empresa;
+	private String empresaModuladora;
 	private String email;
 	private String rut;// rut sin digito verficador
 	private boolean extranjero = false;// segun rut
@@ -47,12 +48,14 @@ public class PersonalDTO {
 		// validacion de campos obligatorios
 		FormatoCampos.verifyStringObligatorio("Nombre", nombre);
 		FormatoCampos.verifyStringObligatorio("Empresa", empresa);
+		FormatoCampos.verifyStringObligatorio("Empresa Moduladora", empresaModuladora);
 		//FormatoCampos.verifyStringObligatorio("Email", email);// no se requiere enviar email en 2024
 		
 		// validacion de tamaño de strings
 		FormatoCampos.verifyStringMinMaxLength(Personal.class, "nombre", "Nombre", nombre, 2);
 		FormatoCampos.verifyStringMinMaxLength(Expositor.class, "nombre", "Empresa", empresa, 3);
-		FormatoCampos.verifyStringMinMaxLength(Expositor.class, "email", "Email", email, 3);
+		FormatoCampos.verifyStringMinMaxLength(Modulador.class, "nombre", "Empresa Moduladora", empresaModuladora, 3);
+		FormatoCampos.verifyStringMinMaxLength(Modulador.class, "email", "Email", email, 3);
 		FormatoCampos.verifyStringMaxLength(Personal.class, "rut", "Rut", rut);
 		FormatoCampos.verifyStringMaxLength(Personal.class, "observaciones", "Observaciones", observaciones);
 		

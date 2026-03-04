@@ -1,6 +1,7 @@
 package com.sicep.exponor2023.acreditacion_montaje.service;
 
-import java.io.File;
+import java.awt.print.*;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.sicep.exponor2023.acreditacion_montaje.dao.ModuladorRepository;
+import com.sicep.exponor2023.acreditacion_montaje.domain.personal.*;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.printing.PDFPageable;
+import org.apache.pdfbox.printing.PDFPrintable;
+import org.apache.pdfbox.printing.Scaling;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,13 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sicep.exponor2023.acreditacion_montaje.dao.AsistenciaPersonalRepository;
 import com.sicep.exponor2023.acreditacion_montaje.dao.ExpositorRepository;
 import com.sicep.exponor2023.acreditacion_montaje.dao.PersonalRepository;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.AsistenciaPersonal;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Expositor;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.FilterListaPersonal;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Personal;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.PersonalDTO;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.PersonalNoRegistradoDTO;
-import com.sicep.exponor2023.acreditacion_montaje.domain.personal.PersonalScanQrDTO;
 import com.sicep.exponor2023.acreditacion_montaje.domain.usuario.Usuario;
 import com.sicep.exponor2023.acreditacion_montaje.resources.ServiceLayerException;
 import com.sicep.exponor2023.acreditacion_montaje.util.UtilFecha;
@@ -33,11 +33,18 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.print.*;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+
+import static java.awt.SystemColor.text;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class PersonalService {
+	private final ModuladorRepository moduladorRepository;
+	private final ModuladorRepService moduladorRepService;
 	@Value("#{'${propiedad.carpetaLocal}'.concat('/tickets')}")
 	private String rutaTickets;
 	@Value("${propiedad.ver.marca-asistencia}")
@@ -121,8 +128,19 @@ public class PersonalService {
 			if (dto.getEmail() == null)
 				dto.setEmail(String.format("%s@sicep.cl", generateCodigo4()));
 			
-			expositor = new Expositor(dto.getEmpresa(), dto.getEmail());
+			expositor = new Expositor(dto.getEmpresa(), "");
 			expositorRepository.save(expositor);
+		}
+
+		// busqueda o creacion de la empresa moduladora
+		Modulador moduladora  = moduladorRepository.findByNombreIgnoreCase(dto.getEmpresaModuladora());
+		if (moduladora == null) {
+			// relleno aleatorio de email si vacio
+			if (dto.getEmail() == null)
+				dto.setEmail(String.format("%s@sicep.cl", generateCodigo4()));
+
+			moduladora = new Modulador(dto.getEmpresaModuladora(), dto.getEmail());
+			moduladorRepository.save(moduladora);
 		}
 		
 		// buscar personal si existe por rut
@@ -139,6 +157,7 @@ public class PersonalService {
 			personal.setNombre(dto.getNombre());
 			personal.setRut(dto.getRut());
 			personal.getListaExpositor().add(expositor);
+			personal.getListaModulador().add(moduladora);
 			personal.setExtranjero(dto.isExtranjero());
 			personal.setObservaciones(dto.getObservaciones());
 			personal.setNacionalidad(dto.getNacionalidad());
@@ -155,7 +174,10 @@ public class PersonalService {
 		else {
 			if (personal.getListaExpositor().contains(expositor))
 				return personal;
+			if (personal.getListaModulador().contains(moduladora))
+				return personal;
 			personal.getListaExpositor().add(expositor);
+			personal.getListaModulador().add(moduladora);
 			personalRepository.save(personal);
 		}
 		return personal;
@@ -300,9 +322,9 @@ public class PersonalService {
 		return null;
 	}
 
-	public void sendEmailByExpositor(long idExpositor) throws ServiceLayerException {
-		Expositor expositor = expositorRepService.getById(idExpositor);
-		emailService.sendByExpositor(expositor);
+	public void sendEmailByModulador(long idModulador) throws ServiceLayerException {
+		Modulador modulador = moduladorRepService.getById(idModulador);
+		emailService.sendByModulador(modulador);
 	}
 
 	public Personal printTicket(Usuario acreditador, String codigo) throws ServiceLayerException {
@@ -318,22 +340,52 @@ public class PersonalService {
 		qrGeneratorService.generateQRCode(personal);
 		
 		// convirtiendo el ticket de png a pdf
-		ticketGeneratorService.convertToPdf(personal);
+		File file = ticketGeneratorService.convertToPdf(personal);
+
 		// habilitar
-		RestTemplate restTemplate= new RestTemplate();
+//		RestTemplate restTemplate= new RestTemplate();
+//		try {
+//			restTemplate.getForEntity("http://127.0.0.1:8001/print/"+personal.getCodigo(), String.class);
+//		}
+//		catch(Exception e) {
+//			log.error(e.getMessage(), e);
+//		}
+
 		try {
-			restTemplate.getForEntity("http://127.0.0.1:8001/print/"+personal.getCodigo(), String.class);
+			printFile(file);
+		} catch (Exception e) {
+			log.error("Error al imprimir ticket para personal {}: {}", personal.getCodigo(), e.getMessage(), e);
+			throw new ServiceLayerException("Error al imprimir ticket. Por favor, intente nuevamente.");
 		}
-		catch(Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		
+
 		personal.setImpresionTicketDate(UtilFecha.ahora());
 		personalRepository.save(personal);
 		
 		return personal;
 	}
-	
+
+	public void printFile(File pdfFile) throws IOException, PrinterException {
+		PDDocument document = PDDocument.load(pdfFile);
+
+		PrinterJob job = PrinterJob.getPrinterJob();
+
+		// Configurar papel con tamaño personalizado (29mm x 90mm)
+		Paper paper = new Paper();
+		double width = 29 * 72 / 25.4;   // 29 mm -> 82.05 pts
+		double height = 90 * 72 / 25.4; // 90 mm -> 255.12 pts
+		paper.setSize(width, height);
+		paper.setImageableArea(0, 0, width, height);
+
+		PageFormat pageFormat = new PageFormat();
+		pageFormat.setOrientation(PageFormat.LANDSCAPE);
+		pageFormat.setPaper(paper);
+
+		Printable printable = new PDFPrintable(document, Scaling.SCALE_TO_FIT);
+
+		job.setPrintable(printable, pageFormat);
+
+		job.print();
+	}
 	
 	public void marcarAsistencia(Usuario acreditador, String codigo) throws ServiceLayerException {
 		Personal personal = personalRepService.getPersonalByCodigo(codigo);
