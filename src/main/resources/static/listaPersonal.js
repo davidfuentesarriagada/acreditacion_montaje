@@ -64,16 +64,16 @@ function initSelect() {
                         return '<div class="no-results">No se encontraron resultados</div>';
                     },
                     option_create: function(data, escape) {
-                        if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
-                            return false;
-                        }
+                        // if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                        //     return false;
+                        // }
                         return '<div class="create">Añadir empresa nueva: "<strong>' + escape(data.input) + '</strong>"</div>';
                     }
                 },
                 create: function(input) {
-                    if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
-                        return false;
-                    }
+                    // if (this.lastQuery && this.currentResults && this.currentResults.items.length > 0) {
+                    //     return false;
+                    // }
                     // Si no hay resultados, permitir crear
                     return {
                         value: input,
