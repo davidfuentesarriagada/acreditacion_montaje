@@ -473,8 +473,9 @@ function initReprint(event) {
 }
 
 function doPrint(codigo) {
+    const seleccion = $("#miSelectEndpoint").val();
     cargando();
-    $.get(`${contextpath}PersonalController/personal/${codigo}/printTicket`)
+    $.get(`${contextpath}PersonalController/personal/${codigo}/printTicket/${seleccion}`)
         .done(function (data) {
             showToast(`Se ha impreso el ticket para ${data.nombre}`);
             tabla.ajax.reload();// recarga la tabla

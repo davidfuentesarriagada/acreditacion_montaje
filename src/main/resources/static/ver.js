@@ -17,7 +17,8 @@ function initPrintTicket() {
 }
 
 function printTicket() {
-	$.post(`${contextpath}PersonalController/personal/${codigo}/printTicket`)
+    const seleccion = $("#miSelectEndpoint").val();
+	$.get(`${contextpath}PersonalController/personal/${codigo}/printTicket/${seleccion}`)
 		.done(function () {
 			showToast("Imprimiendo Ticket");
 		})

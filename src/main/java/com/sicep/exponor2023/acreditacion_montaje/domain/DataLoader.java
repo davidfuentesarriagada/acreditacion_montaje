@@ -1,6 +1,11 @@
 package com.sicep.exponor2023.acreditacion_montaje.domain;
 
 import java.io.File;
+
+import com.sicep.exponor2023.acreditacion_montaje.dao.ImpresoraRepository;
+import com.sicep.exponor2023.acreditacion_montaje.resources.ServiceLayerException;
+import com.sicep.exponor2023.acreditacion_montaje.service.ImpresoraRepService;
+import com.sicep.exponor2023.acreditacion_montaje.service.ImpresoraService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -24,6 +29,8 @@ public class DataLoader implements ApplicationRunner {
 	private final UsuarioRepository usuarioRepository;
 	private final ResourceLoader resourceLoader;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private final ImpresoraRepository impresoraRepository;
+	private final ImpresoraService impresoraService;
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -35,7 +42,41 @@ public class DataLoader implements ApplicationRunner {
 		crearCarpetaPlantilla();
 		log.info("INICIO CREACION CARPETA TICKETS");
 		crearCarpetaTickets();
+		log.info("INICIO CARGA IMPRESORAS");
+		impresoras();
 		log.info("DATALOADER END");
+	}
+
+	private void impresoras() {
+		if (impresoraRepository.count() > 0)
+			return;
+		try {
+			impresoraService.register("Brother QL-710W wifi1");
+			impresoraService.register("Brother QL-710W wifi2");
+			impresoraService.register("Brother QL-710W wifi3");
+			impresoraService.register("Brother QL-710W wifi4");
+			impresoraService.register("Brother QL-710W wifi5");
+			impresoraService.register("Brother QL-710W wifi6");
+			impresoraService.register("Brother QL-710W wifi7");
+			impresoraService.register("Brother QL-710W wifi8");
+			impresoraService.register("Brother QL-710W wifi9");
+			impresoraService.register("Brother QL-710W wifi10");
+
+			impresoraService.register("Brother QL-710W usb1");
+			impresoraService.register("Brother QL-710W usb2");
+			impresoraService.register("Brother QL-710W usb3");
+			impresoraService.register("Brother QL-710W usb4");
+			impresoraService.register("Brother QL-710W usb5");
+			impresoraService.register("Brother QL-710W usb6");
+			impresoraService.register("Brother QL-710W usb7");
+			impresoraService.register("Brother QL-710W usb8");
+			impresoraService.register("Brother QL-710W usb9");
+			impresoraService.register("Brother QL-710W usb10");
+
+		}
+		catch (ServiceLayerException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 	
 	private void developer() {

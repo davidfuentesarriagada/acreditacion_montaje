@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.sicep.exponor2023.acreditacion_montaje.dao.ImpresoraRepository;
+import com.sicep.exponor2023.acreditacion_montaje.domain.Impresora;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPrintable;
 import org.apache.pdfbox.printing.Scaling;
@@ -61,6 +63,8 @@ public class PersonalService {
 	private final EmailService emailService;
 	private final ExpositorRepService expositorRepService;
 	private final AsistenciaPersonalRepository asistenciaPersonalRepository;
+
+	private final ImpresoraRepService impresoraRepService;
 	
 	public Map<String, Object> filter(FilterListaPersonal filtro) {
 		Map<String, Object> respuesta = new HashMap<>();
@@ -318,6 +322,14 @@ public class PersonalService {
 		return printTicket(personal);
 	}
 
+	public Personal printTicketAcrobat(Usuario acreditador, String codigo, Long idImpresora) throws ServiceLayerException {
+		Personal personal = personalRepService.getPersonalByCodigo(codigo);
+		if (marcaAsistencia)
+			marcarAsistencia(acreditador, personal);
+
+		return printTicketLocalProcess(personal, idImpresora);
+	}
+
 	public Personal printTicket(Personal personal) throws ServiceLayerException {
 		// creando el qr si no existe
 		qrGeneratorService.generateQRCode(personal);
@@ -336,6 +348,28 @@ public class PersonalService {
 		personal.setImpresionTicketDate(UtilFecha.ahora());
 		personalRepository.save(personal);
 
+		return personal;
+	}
+
+	public Personal printTicketLocalProcess(Personal personal, long idImpresora) throws ServiceLayerException {
+		// creando el qr si no existe
+		qrGeneratorService.generateQRCode(personal);
+
+		// convirtiendo el ticket de png a pdf
+		String rutaTicketLocal = ticketGeneratorService.convertToPdf(personal);
+
+		Impresora impresora = this.impresoraRepService.getById(idImpresora);
+
+		String[] cmd = {"C:\\Program Files\\Adobe\\Acrobat DC\\Acrobat\\Acrobat.exe",
+				"/N", "/T", rutaTicketLocal, impresora.getPrinterName()};
+		try {
+			Runtime.getRuntime().exec(cmd);
+		}
+		catch(Exception e) {
+			throw new ServiceLayerException(e.getMessage());
+		}
+		personal.setImpresionTicketDate(UtilFecha.ahora());
+		personalRepository.save(personal);
 		return personal;
 	}
 

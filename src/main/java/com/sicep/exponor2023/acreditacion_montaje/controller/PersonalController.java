@@ -6,6 +6,7 @@ import java.security.Principal;
 import com.sicep.exponor2023.acreditacion_montaje.service.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,7 @@ public class PersonalController {
 	private final ExcelListadoPersonalService excelListadoPersonalService;
 	private final ExcelListadoAsistenciaService excelListadoAsistenciaService;
 	private final ExpositorRepService expositorRepService;
+	private final ImpresoraRepService impresoraRepService;
 	
 	@PostMapping("personal/filter")
 	public ResponseEntity<Object> filter(@RequestBody FilterListaPersonal filtro) {
@@ -133,7 +135,7 @@ public class PersonalController {
 		}
 	}
 
-	@RequestMapping("/personal/{codigo}/printTicket")
+	@GetMapping("/personal/{codigo}/printTicket")
 	public ResponseEntity<Object> printTicket(Principal principal, @PathVariable String codigo) {
 		try {
 			Usuario usuario = usuarioService.getUsuarioFromSession(principal);
@@ -143,6 +145,27 @@ public class PersonalController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+
+	@RequestMapping("/personal/{codigo}/printTicket/{idImpresora}")
+	public ResponseEntity<Object> printTicket(Principal principal, @PathVariable String codigo, @PathVariable long idImpresora) {
+		try {
+			Usuario usuario = usuarioService.getUsuarioFromSession(principal);
+			return new ResponseEntity<>(personalService.printTicketAcrobat(usuario, codigo, idImpresora), HttpStatus.OK);
+		}
+		catch (ServiceLayerException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+//	@GetMapping("/personal/{codigo}/pdf")
+//	public ResponseEntity<byte[]> generarPdf() {
+//		byte[] pdf = servicioPdf.generar(); // tu método que crea el PDF
+//
+//		return ResponseEntity.ok()
+//				.header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+//				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=archivo.pdf")
+//				.body(pdf);
+//	}
 	
 	@GetMapping("/personal/lista/exportar")
 	public ResponseEntity<Object> exportarLista(Principal principal, HttpServletResponse response) {
@@ -222,6 +245,16 @@ public class PersonalController {
 	public ResponseEntity<Object> getAllExpositores() {
 		try {
 			return new ResponseEntity<>(expositorRepService.findAll(), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/impresora/all")
+	public ResponseEntity<Object> getAllImpresoras() {
+		try {
+			return new ResponseEntity<>(impresoraRepService.list(), HttpStatus.OK);
 		}
 		catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
