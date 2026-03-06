@@ -1,8 +1,9 @@
 package com.sicep.exponor2023.acreditacion_montaje.service;
 
 import java.awt.print.*;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,11 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sicep.exponor2023.acreditacion_montaje.dao.ImpresoraRepository;
 import com.sicep.exponor2023.acreditacion_montaje.domain.Impresora;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.printing.PDFPrintable;
-import org.apache.pdfbox.printing.Scaling;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -112,11 +109,11 @@ public class PersonalService {
 		}
 		
 		// print inmediato si corresponde
-		if (printTicket) {
-			qrGeneratorService.generateQRCode(personal);
-			ticketGeneratorService.generateTicket(personal);
-			printTicket(personal);
-		}
+//		if (printTicket) {
+//			qrGeneratorService.generateQRCode(personal);
+//			ticketGeneratorService.generateTicket(personal);
+//			printTicket(personal);
+//		}
 
 		return personal;
 	}
@@ -243,6 +240,16 @@ public class PersonalService {
 		}
 	}
 
+	public void marcarNoImpreso(String codigo) throws ServiceLayerException {
+		try {
+			Personal personal = personalRepService.getPersonalByCodigo(codigo);
+			personal.setImpresionTicketDate(null);
+			personalRepository.save(personal);
+		} catch (Exception e) {
+			throw new ServiceLayerException(e.getMessage(), e);
+		}
+	}
+
 	public void importExpositoresFromAcreditacion(MultipartFile uploadedFile, Usuario usuario) throws ServiceLayerException {
 		// validacion de la extension
 		String fileName = uploadedFile.getOriginalFilename().toLowerCase();
@@ -351,6 +358,19 @@ public class PersonalService {
 		return personal;
 	}
 
+	public byte[] getByteFileToPrint(String codigo) throws ServiceLayerException, IOException {
+		Personal personal = personalRepService.getPersonalByCodigo(codigo);
+		try {
+			qrGeneratorService.generateQRCode(personal);
+			byte[] fileBytes = Files.readAllBytes(Path.of(ticketGeneratorService.convertToPdf(personal)));
+			personal.setImpresionTicketDate(UtilFecha.ahora());
+			personalRepository.save(personal);
+			return fileBytes;
+		} catch (Exception e) {
+			throw new ServiceLayerException(e.getMessage(), e);
+		}
+	}
+
 	public Personal printTicketLocalProcess(Personal personal, long idImpresora) throws ServiceLayerException {
 		// creando el qr si no existe
 		qrGeneratorService.generateQRCode(personal);
@@ -373,50 +393,6 @@ public class PersonalService {
 		return personal;
 	}
 
-//	public Personal printTicket(Personal personal) throws ServiceLayerException {
-//		// creando el qr si no existe
-//		qrGeneratorService.generateQRCode(personal);
-//
-//		// convirtiendo el ticket de png a pdf
-//		File file = ticketGeneratorService.convertToPdf(personal);
-//
-//		try {
-//			printFile(file);
-//		} catch (Exception e) {
-//			log.error("Error al imprimir ticket para personal {}: {}", personal.getCodigo(), e.getMessage(), e);
-//			throw new ServiceLayerException("Error al imprimir ticket. Por favor, intente nuevamente.");
-//		}
-//
-//		personal.setImpresionTicketDate(UtilFecha.ahora());
-//		personalRepository.save(personal);
-//
-//		return personal;
-//	}
-
-//	public void printFile(File pdfFile) throws IOException, PrinterException {
-//		PDDocument document = PDDocument.load(pdfFile);
-//
-//		PrinterJob job = PrinterJob.getPrinterJob();
-//
-//		// Configurar papel con tamaño personalizado (29mm x 90mm)
-//		Paper paper = new Paper();
-//		double width = 29 * 72 / 25.4;   // 29 mm -> 82.05 pts
-//		double height = 90 * 72 / 25.4; // 90 mm -> 255.12 pts
-//		paper.setSize(width, height);
-//		paper.setImageableArea(0, 0, width, height);
-//
-//		PageFormat pageFormat = new PageFormat();
-//		pageFormat.setOrientation(PageFormat.LANDSCAPE);
-//		pageFormat.setPaper(paper);
-//
-//		Printable printable = new PDFPrintable(document, Scaling.SCALE_TO_FIT);
-//
-//		job.setPrintable(printable, pageFormat);
-//
-//		job.print();
-//	}
-	
-	
 	public void marcarAsistencia(Usuario acreditador, String codigo) throws ServiceLayerException {
 		Personal personal = personalRepService.getPersonalByCodigo(codigo);
 		marcarAsistencia(acreditador, personal);

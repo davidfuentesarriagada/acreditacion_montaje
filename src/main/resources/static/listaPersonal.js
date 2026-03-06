@@ -472,16 +472,30 @@ function initReprint(event) {
         });
 }
 
-function doPrint(codigo) {
-    const seleccion = $("#miSelectEndpoint").val();
-    cargando();
-    $.get(`${contextpath}PersonalController/personal/${codigo}/printTicket/${seleccion}`)
-        .done(function (data) {
-            showToast(`Se ha impreso el ticket para ${data.nombre}`);
-            tabla.ajax.reload();// recarga la tabla
-        })
-        .fail(error => showError(error.responseText))
-        .always(() => cargaFinalizada());
+async function doPrint(codigo) {
+    const response = await fetch(`${contextpath}PersonalController/personal/${codigo}/pdf`); // tu endpoint
+    const bytes = await response.arrayBuffer();
+
+    const blob = new Blob([bytes], {type: 'application/pdf'});
+    const url = URL.createObjectURL(blob);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+
+    document.body.appendChild(iframe);
+
+    iframe.onload = function () {
+        window.onafterprint = () => {
+            console.log("Diálogo cerrado");
+        };
+
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    };
+
+    tabla.ajax.reload()
+
 }
 
 

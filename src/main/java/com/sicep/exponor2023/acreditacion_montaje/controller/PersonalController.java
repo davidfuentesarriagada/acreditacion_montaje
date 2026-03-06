@@ -146,6 +146,7 @@ public class PersonalController {
 		}
 	}
 
+	//impresion de tickets local con acrobat instalado
 	@RequestMapping("/personal/{codigo}/printTicket/{idImpresora}")
 	public ResponseEntity<Object> printTicket(Principal principal, @PathVariable String codigo, @PathVariable long idImpresora) {
 		try {
@@ -157,15 +158,15 @@ public class PersonalController {
 		}
 	}
 
-//	@GetMapping("/personal/{codigo}/pdf")
-//	public ResponseEntity<byte[]> generarPdf() {
-//		byte[] pdf = servicioPdf.generar(); // tu método que crea el PDF
-//
-//		return ResponseEntity.ok()
-//				.header(HttpHeaders.CONTENT_TYPE, "application/pdf")
-//				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=archivo.pdf")
-//				.body(pdf);
-//	}
+	@GetMapping("/personal/{codigo}/pdf")
+	public ResponseEntity<byte[]> generarPdf(@PathVariable String codigo) throws ServiceLayerException, IOException {
+		byte[] pdf = personalService.getByteFileToPrint(codigo); // tu método que crea el PDF
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=ticket.pdf")
+				.body(pdf);
+	}
 	
 	@GetMapping("/personal/lista/exportar")
 	public ResponseEntity<Object> exportarLista(Principal principal, HttpServletResponse response) {
@@ -257,6 +258,17 @@ public class PersonalController {
 			return new ResponseEntity<>(impresoraRepService.list(), HttpStatus.OK);
 		}
 		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PostMapping("/personal/noimpreso/{codigo}")
+	public ResponseEntity<Object> marcarNoImpreso(@PathVariable String codigo, Principal principal) {
+		try {
+			personalService.marcarNoImpreso(codigo);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (ServiceLayerException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}

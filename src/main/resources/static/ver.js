@@ -2,29 +2,38 @@ $(function() {
 	$("#btn_generate_images").on("click", generateImages);
 	$("#btn_email_empresa").on("click", sendEmail);
 	$("#btn_delete").on("click", initDelete);
+    $("#btn_delete_printed").on("click", initMarcarNoImpreso);
 });
 
 function initPrintTicket() {
-	if (!imprimeTicketHabilitado) {
-		printTicketLocal();
-		return;
-	}
-	
-	if (fechaImpresion !== null)
-		showConfirm('Volver a imprimir el ticket', '¿Desea volver a imprimir el Ticket?', printTicket);
-	else
-		printTicket();
+    if (!imprimeTicketHabilitado) {
+        printTicketLocal();
+        return;
+    }
+
+    if (fechaImpresion !== null)
+        showConfirm('Volver a imprimir el ticket', '¿Desea volver a imprimir el Ticket?', printTicket);
+    else
+        printTicket();
 }
 
-function printTicket() {
-    const seleccion = $("#miSelectEndpoint").val();
-	$.get(`${contextpath}PersonalController/personal/${codigo}/printTicket/${seleccion}`)
-		.done(function () {
-			showToast("Imprimiendo Ticket");
-		})
-		.fail(function(error) {
-			showError(error.responseText);
-		});
+async function printTicket() {
+    const response = await fetch(`${contextpath}PersonalController/personal/${codigo}/pdf`); // tu endpoint
+    const buffer = await response.arrayBuffer();
+
+    const blob = new Blob([buffer], {type: 'application/pdf'});
+    const url = URL.createObjectURL(blob);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+
+    document.body.appendChild(iframe);
+
+    iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    };
 }
 
 function printTicketLocal() {
@@ -66,6 +75,10 @@ function initDelete() {
 	showConfirm("Eliminar personal", "¿Desea eliminar este registro?", doDelete);
 }
 
+function initMarcarNoImpreso() {
+    showConfirm("Marcar ticket no impreso", "¿Desea marcar que el ticket no ha sido impreso para esta persona?", doMarcarNoImpreso);
+}
+
 function doDelete() {
 	cargando();
 	$.post(`${contextpath}PersonalController/personal/remover/${codigo}`)
@@ -74,6 +87,14 @@ function doDelete() {
 		})
 		.fail(error => showError(error.responseText))
 		.always(() => cargaFinalizada());
+}
+
+function doMarcarNoImpreso() {
+    cargando();
+    $.post(`${contextpath}PersonalController/personal/noimpreso/${codigo}`)
+        .fail(error => showError(error.responseText))
+        .always(() => cargaFinalizada());
+    window.location.reload();
 }
 
 // ======================

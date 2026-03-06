@@ -39,10 +39,10 @@
 						<span class="badge text-bg-secondary" th:unless="${@environment.getProperty('propiedad.printTicket')}">Impresión no habilitada</span>
 					</li>
 				</ul>
-                <div class="d-flex align-items-center me-3">
-                    <select id="miSelectEndpoint" class="form-select form-select-sm">
-                    </select>
-                </div>
+<!--                <div class="d-flex align-items-center me-3">-->
+<!--                    <select id="miSelectEndpoint" class="form-select form-select-sm">-->
+<!--                    </select>-->
+<!--                </div>-->
 				<div class="d-flex">
 					<button id="btnSalir" class="btn btn-danger">Salir</button>
 				</div>
@@ -50,32 +50,33 @@
 		</div>
 	</nav>
 
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-	    document.addEventListener('DOMContentLoaded', function() {
-	        const select = document.getElementById('miSelectEndpoint');
-	        if (!select) return
-	        $.get(`${contextpath}PersonalController/impresora/all`)
-	            .then(function(response) {
-	                if (!response) {
-	                    throw new Error('Error al cargar datos del endpoint');
-	                }
-	                return response;
-	            })
-	            .then(function(data) {
-	                // Se asume que "data" es un array de objetos {id, nombre}
-	                data.forEach(function(item) {
-	                    const option = document.createElement('option');
-	                    option.value = item.id;
-	                    option.textContent = item.printerName;
-	                    select.appendChild(option);
-	                });
-	            })
-	            .catch(function(error) {
-	                console.error('Error cargando opciones:', error);
-	            });
-	    });
-	/*]]>*/
-	</script>
+<!--Para traer la cantidad de impresoras disponibles-->
+<!--	<script th:inline="javascript">-->
+<!--	/*<![CDATA[*/-->
+<!--	    document.addEventListener('DOMContentLoaded', function() {-->
+<!--	        const select = document.getElementById('miSelectEndpoint');-->
+<!--	        if (!select) return-->
+<!--	        $.get(`${contextpath}PersonalController/impresora/all`)-->
+<!--	            .then(function(response) {-->
+<!--	                if (!response) {-->
+<!--	                    throw new Error('Error al cargar datos del endpoint');-->
+<!--	                }-->
+<!--	                return response;-->
+<!--	            })-->
+<!--	            .then(function(data) {-->
+<!--	                // Se asume que "data" es un array de objetos {id, nombre}-->
+<!--	                data.forEach(function(item) {-->
+<!--	                    const option = document.createElement('option');-->
+<!--	                    option.value = item.id;-->
+<!--	                    option.textContent = item.printerName;-->
+<!--	                    select.appendChild(option);-->
+<!--	                });-->
+<!--	            })-->
+<!--	            .catch(function(error) {-->
+<!--	                console.error('Error cargando opciones:', error);-->
+<!--	            });-->
+<!--	    });-->
+<!--	/*]]>*/-->
+<!--	</script>-->
 </th:block>
 </html>
