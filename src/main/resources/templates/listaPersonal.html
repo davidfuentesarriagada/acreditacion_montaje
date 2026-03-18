@@ -274,8 +274,19 @@
 
                         <!-- Empresa -->
                         <div class="mb-3">
-                            <label class="form-label">* Empresa</label>
+                            <label class="form-label">* Empresa Expositora</label>
                             <select id="lbl_empresa" name="campo">
+                                <option th:each="op : ${opciones}"
+                                        th:value="${op}"
+                                        th:text="${op}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Empresa Moduladora -->
+                        <div class="mb-3">
+                            <label class="form-label">* Empresa Moduladora</label>
+                            <select id="lbl_empresa_moduladora" name="campo">
                                 <option th:each="op : ${opciones}"
                                         th:value="${op}"
                                         th:text="${op}">
@@ -408,7 +419,7 @@
 <!-- Variables desde el backend -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-    let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket')}]]*/ false;
+    let imprimeTicketHabilitado = /*[[${@environment.getProperty('propiedad.printTicket')}]]*/ true;
     let marcaAsistenciaHabilitado = /*[[${@environment.getProperty('propiedad.ver.marca-asistencia')}]]*/ false;
     /*]]>*/
 </script>

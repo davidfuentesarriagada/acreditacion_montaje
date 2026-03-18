@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import com.sicep.exponor2023.acreditacion_montaje.domain.personal.Modulador;
 import org.thymeleaf.context.Context;
 
 import com.sicep.exponor2023.acreditacion_montaje.domain.email.PlantillaEmail;
@@ -35,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EmailAcreditacion extends EmailBase implements EmailConUrlServer {
 	@ManyToOne(optional = false)
-	private Expositor expositor;
+	private Modulador modulador;
 	@Transient
 	private String urlServer;
 	@Transient
@@ -46,10 +47,10 @@ public class EmailAcreditacion extends EmailBase implements EmailConUrlServer {
 	public EmailAcreditacion() {
 	}
 
-	public EmailAcreditacion(Expositor expositor) throws ServiceLayerException {
-		this.expositor = expositor;
+	public EmailAcreditacion(Modulador modulador) throws ServiceLayerException {
+		this.modulador = modulador;
 		this.subject = PlantillaEmail.nombreEvento + " - Credenciales acreditación montaje";
-		
+
 		MimeMessage mimeMessage = generarMimeMessage();
 		// asignacion y calculo de destinatarios en el objeto
 		try {
@@ -74,7 +75,7 @@ public class EmailAcreditacion extends EmailBase implements EmailConUrlServer {
 				this.destinatariosTo = Arrays.toString(testEmailTo).replace("[", "").replace("]", "");
 			}
 			else {
-				mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(expositor.getEmail()));
+				mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(modulador.getEmail()));
 			}
 
 			return mimeMessage;
@@ -93,11 +94,11 @@ public class EmailAcreditacion extends EmailBase implements EmailConUrlServer {
 			
 			// atributos del template de email (lo unico que varia en este email del evento)
 			Context context = new Context();
-			context.setVariable("nombreEmpresa", expositor.getNombre());
+			context.setVariable("nombreEmpresa", modulador.getNombre());
 			context.setVariable("listaPersonal", listaPersonal);
 			
 			// agregando al email acceso a desuscripcion
-			PlantillaEmail.addDesuscripcion(mimeMessage, "ACREDITACION_MONTAJE", expositor.getEmail(), urlServer, "/",context);
+			PlantillaEmail.addDesuscripcion(mimeMessage, "ACREDITACION_MONTAJE", modulador.getEmail(), urlServer, "/",context);
 			
 			// conversion de la plantilla
 			String process = getTemplateEngine().process("email/acreditacion", context);

@@ -39,8 +39,9 @@ public class PersonalController {
 	private final ExcelListadoPersonalService excelListadoPersonalService;
 	private final ExcelListadoAsistenciaService excelListadoAsistenciaService;
 	private final ExpositorRepService expositorRepService;
+	private final ModuladorRepService moduladorRepService;
 	private final ImpresoraRepService impresoraRepService;
-	
+
 	@PostMapping("personal/filter")
 	public ResponseEntity<Object> filter(@RequestBody FilterListaPersonal filtro) {
 		return new ResponseEntity<>(personalService.filter(filtro), HttpStatus.OK);
@@ -124,10 +125,10 @@ public class PersonalController {
 		}
 	}
 
-	@PostMapping("/expositor/{idExpositor}/sendEmail")
-	public ResponseEntity<Object> sendEmail(@PathVariable long idExpositor) {
+	@PostMapping("/expositor/{idModulador}/sendEmail")
+	public ResponseEntity<Object> sendEmail(@PathVariable long idModulador) {
 		try {
-			personalService.sendEmailByExpositor(idExpositor);
+			personalService.sendEmailByModulador(idModulador);
 			return new ResponseEntity<>(true, HttpStatus.OK);
 		}
 		catch (ServiceLayerException e) {
@@ -167,7 +168,7 @@ public class PersonalController {
 				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=ticket.pdf")
 				.body(pdf);
 	}
-	
+
 	@GetMapping("/personal/lista/exportar")
 	public ResponseEntity<Object> exportarLista(Principal principal, HttpServletResponse response) {
 		try {
@@ -269,6 +270,16 @@ public class PersonalController {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		catch (ServiceLayerException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/modulador/all")
+	public ResponseEntity<Object> getAllModulador() {
+		try {
+			return new ResponseEntity<>(moduladorRepService.findAll(), HttpStatus.OK);
+		}
+		catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}

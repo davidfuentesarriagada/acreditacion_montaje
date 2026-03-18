@@ -181,6 +181,29 @@
                             <dd class="col-sm-8 col-md-9" th:text="${personal.observaciones}"></dd>
                         </dl>
 
+                        <!--Empresa moduladora-->
+                        <div class="mb-2">
+                            <h6 class="mb-1">
+                                <i class="bi bi-people-fill me-1 text-secondary"></i>
+                                Empresa moduladora
+                            </h6>
+                        </div>
+
+                        <dl class="row mb-0" th:each="modulador : ${personal.listaModulador}">
+                            <dt class="col-sm-3"></dt>
+                            <dd class="col-sm-9 d-flex align-items-center gap-2">
+                                <span th:text="|${modulador.nombre} - ${modulador.email}|"></span>
+                                <a class="btn btn-outline-primary btn-sm"
+                                   role="button"
+                                   href="#"
+                                   th:attr="onclick=|sendEmail('${modulador.id}')|">
+                                    <svg class="bi" width="14" height="14" fill="currentColor">
+                                        <use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#envelope}"></use>
+                                    </svg>
+                                </a>
+                            </dd>
+                        </dl>
+
                         <!-- Expositores -->
                         <div class="mb-2">
                             <h6 class="mb-1">
@@ -192,15 +215,11 @@
                         <dl class="row mb-0" th:each="expositor : ${personal.listaExpositor}">
                             <dt class="col-sm-3"></dt>
                             <dd class="col-sm-9 d-flex align-items-center gap-2">
-                                <span th:text="|${expositor.nombre} - ${expositor.email}|"></span>
-                                <a class="btn btn-outline-primary btn-sm"
-                                   role="button"
-                                   href="#"
-                                   th:attr="onclick=|sendEmail('${expositor.id}')|">
-                                    <svg class="bi" width="14" height="14" fill="currentColor">
-                                        <use th:xlink:href="@{/webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#envelope}"></use>
-                                    </svg>
-                                </a>
+                                <span th:text="${expositor.nombre} + ' - '"></span>
+                                <span th:text="${#strings.isEmpty(#strings.trim(expositor.email))
+                                                ? '(Sin correo disponible)'
+                                                : expositor.email}">
+                                </span>
                             </dd>
                         </dl>
 

@@ -43,6 +43,10 @@ public class Personal extends Auditable implements PersonalScanQrDTO {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(joinColumns = { @JoinColumn(name = "personal_id") }, inverseJoinColumns = { @JoinColumn(name = "empresa_id") })
 	private List<Expositor> listaExpositor = new ArrayList<>();
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(joinColumns = { @JoinColumn(name = "personal_id") }, inverseJoinColumns = { @JoinColumn(name = "empresa_id") })
+	private List<Modulador> listaModulador = new ArrayList<>();
 	
 	@Column(length = 4)
 	private String codigo;// correspondiente al codigo QR

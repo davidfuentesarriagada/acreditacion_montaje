@@ -51,7 +51,7 @@ public class TicketGeneratorService {
 			// nombre
         	insertaInfoNombre(g, personal.getNombre(), imgTicket.getWidth(), imgTicket.getHeight(), 0);
 			// empresa
-        	String nombreEmpresas = personal.getListaExpositor().stream().map(e -> e.getNombre()).collect(Collectors.joining(", "));
+        	String nombreEmpresas = personal.getListaModulador().stream().map(e -> e.getNombre()).collect(Collectors.joining(", "));
         	
         	insertaInfoEmpresa(g, nombreEmpresas, imgTicket.getWidth(), imgTicket.getHeight(), imgTicket.getHeight() * 1 / 3);
 			// codigo
