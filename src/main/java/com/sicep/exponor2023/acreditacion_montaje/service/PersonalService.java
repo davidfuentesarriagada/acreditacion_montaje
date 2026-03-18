@@ -365,7 +365,7 @@ public class PersonalService {
 		qrGeneratorService.generateQRCode(personal);
 
 		// convirtiendo el ticket de png a pdf
-		File file = ticketGeneratorService.convertToPdf(personal);
+		File file = ticketGeneratorService.convertToPdfFile(personal);
 
 		// habilitar
 //		RestTemplate restTemplate= new RestTemplate();

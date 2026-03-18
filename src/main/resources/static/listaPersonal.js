@@ -506,19 +506,19 @@ function initTable() {
                     accion += `<a class="btn btn-primary btn-sm" href='${contextpath}personal/${data}/ver'>ver</a>`
                     if (imprimeTicketHabilitado == "true") {
                         if (row.fechaImpresionTicket === null) {
-                            accion += `<a class="btn btn-info btn-sm" role="button" href="#" data-personal-codigo="${data}">`;
+                            accion += `<a class="btn btn-info btn-sm" role="button" data-personal-codigo="${data}">`;
                             accion += `<use href="${contextpath}webjars/bootstrap-icons/1.10.5/bootstrap-icons.svg#printer"></use>`;
                             accion += `<span data-personal-codigo="${data}">Imprimir</span>`;
                             accion += `</a>`;
                         }
                         else {
-                            accion += `<a class="btn btn-warning btn-sm" role="button" href="#" data-personal-codigo="${data}">`;
+                            accion += `<a class="btn btn-warning btn-sm" role="button" data-personal-codigo="${data}">`;
                             accion += `<span data-personal-codigo="${data}">Reimprimir</span>`;
                             accion += `</a>`;
                         }
                     }
 					// 🔴 Nuevo botón Eliminar
-					       accion += `<a class="btn btn-danger btn-sm btn-delete-personal" href="#" data-personal-codigo="${data}">Eliminar</a>`;
+					       accion += `<a class="btn btn-danger btn-sm btn-delete-personal" data-personal-codigo="${data}">Eliminar</a>`;
 
                     accion += `</div>`;
                     return accion;

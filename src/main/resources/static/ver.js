@@ -76,7 +76,7 @@ function initDelete() {
 }
 
 function initMarcarNoImpreso() {
-    showConfirm("Marcar ticket no impreso", "¿Desea marcar que el ticket no ha sido impreso para esta persona?", doMarcarNoImpreso);
+    showConfirm("Marcar ticket no impreso", "Se marcará que el ticket no se ha impreso para esta persona ¿Desea continuar?", doMarcarNoImpreso);
 }
 
 function doDelete() {

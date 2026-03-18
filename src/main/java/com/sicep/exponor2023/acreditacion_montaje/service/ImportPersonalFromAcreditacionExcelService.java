@@ -76,8 +76,9 @@ public class ImportPersonalFromAcreditacionExcelService {
 	
 	private List<PersonalDTO> hojaExpositores(Workbook workbook, Sheet hoja) throws ServiceLayerException {
 		CellReference cellRefExpositor = new CellReference("C2");
-		CellReference cellRefEmail = new CellReference("J2");
-		CellReference cellRefPersonal = new CellReference("K2");
+		CellReference cellRefModuladora = new CellReference("G2");
+		CellReference cellRefEmail = new CellReference("K2");
+		CellReference cellRefPersonal = new CellReference("L2");
 		
 		List<PersonalDTO> resultado = new ArrayList<>();
 		for (int nFil = 1; nFil <= hoja.getLastRowNum(); nFil++) {
@@ -85,11 +86,14 @@ public class ImportPersonalFromAcreditacionExcelService {
 			if (row == null)
 				continue;
 			String expositor = getString(row, cellRefExpositor.getCol());
+			String moduladora = getString(row, cellRefModuladora.getCol());
 			String email = getString(row, cellRefEmail.getCol());
 			String trabajadores = getString(row, cellRefPersonal.getCol());
-			if (trabajadores == null)
+			if (trabajadores == null){
+				log.error("Celda con ruts de personal vacía para empresa {}", moduladora);
 				continue;
-			resultado.addAll(parseTrabajadores(expositor, email, trabajadores));
+			}
+			resultado.addAll(parseTrabajadores(expositor, moduladora, email, trabajadores));
 			//log.info("{} {} {}", expositor, email, trabajadores);
 		}
 		
@@ -103,7 +107,7 @@ public class ImportPersonalFromAcreditacionExcelService {
 		return UtilString.textoDesdeVista(cell.getStringCellValue());
 	}
 	
-	private List<PersonalDTO> parseTrabajadores(String empresa, String email, String contenido) {
+	private List<PersonalDTO> parseTrabajadores(String expositora, String moduladora, String email, String contenido) {
 		//log.info(contenido);
 		List<PersonalDTO> listaDto = new ArrayList<>();
 		Pattern pattern = Pattern.compile("Nombre: (.+?) ;  Rut: (.*?) /");
@@ -154,13 +158,14 @@ public class ImportPersonalFromAcreditacionExcelService {
 			}// rut de entrada no nulo
 
 			if(rut == null){
-				log.error("RUT NULO para trabajador {} de empresa {}", nombre, empresa);
+				log.error("RUT NULO para trabajador {} de empresa {}", nombre, moduladora);
 				continue;
 			}
 
 			PersonalDTO dto = new PersonalDTO();
 			dto.setEmail(email);
-			dto.setEmpresa(empresa);
+			dto.setEmpresa(expositora);
+			dto.setEmpresaModuladora(moduladora);
 			dto.setNombre(nombre);
 			dto.setRut(extranjero ? "EXT".concat(rut) : rut);
 			dto.setExtranjero(extranjero);

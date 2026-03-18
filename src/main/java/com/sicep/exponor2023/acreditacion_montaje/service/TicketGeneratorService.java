@@ -251,6 +251,42 @@ public class TicketGeneratorService {
 			throw new ServiceLayerException("No pudo ser generado el ticket pdf para "+codigo);
 		}
 	}
+
+	public File convertToPdfFile(Personal personal) throws ServiceLayerException {
+		String codigo = personal.getCodigo();
+		File pdfFile = new File(carpetaTickets, String.format("ticket_%s.pdf", codigo));
+		// si el pdf existe, no hacer nada
+		if (pdfFile.exists())
+			return pdfFile;
+
+		// se requiere crear el png primero
+		File imageFile = new File(carpetaTickets, String.format("ticket_%s.png", codigo));
+		if (!imageFile.exists()) {
+			// creando el ticket
+			generateTicket(personal);
+			imageFile = new File(carpetaTickets, String.format("ticket_%s.png", codigo));
+		}
+
+		try {
+			// generando el pdf si no existe
+			FileOutputStream fos = new FileOutputStream(pdfFile);
+			com.itextpdf.text.Image image1 = com.itextpdf.text.Image.getInstance(imageFile.getPath());
+			image1.setAbsolutePosition(0, 0);
+			Document document = new Document(image1);
+			PdfWriter writer = PdfWriter.getInstance(document, fos);
+			writer.open();
+			document.open();
+
+			document.add(image1);
+			document.close();
+			writer.close();
+			return new File(carpetaTickets, String.format("ticket_%s.pdf", codigo));
+		}
+		catch(IOException | DocumentException e) {
+			log.error(e.getMessage());
+			throw new ServiceLayerException("No pudo ser generado el ticket pdf para "+codigo);
+		}
+	}
 	
 	public void eliminar(Personal personal) {
 		File pdfFile = new File(carpetaTickets, String.format("ticket_%s.pdf", personal.getCodigo()));
